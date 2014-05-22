@@ -83,7 +83,7 @@ end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  t.DoSetTabColor(1, Random(60000));
+  //t.DoSetTabColor(1, Random(60000));
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -98,7 +98,7 @@ end;
 
 procedure TForm1.TabClick(A: TObject);
 begin
-  Label1.Caption:= 'click: '+t.tabcaption(t.tabindex);
+  Label1.Caption:= 'click: ';//+t.tabcaption(t.tabindex);
 end;
 
 end.

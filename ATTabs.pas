@@ -8,6 +8,13 @@ uses
   Controls, ExtCtrls;
 
 type
+  TATTabData = class
+  public
+    TabCaption: string;
+    TabColor: TColor;
+  end;
+
+type
   TATTabs = class(TPanel)
   private
     FColorBg: TColor;
@@ -32,17 +39,14 @@ type
     FTabColorSize: Integer;
     FTabCloseSize: Integer;
     FTabCloseButtons: boolean;
-    FTabList: TStringList;
-    FTabColors: TList;
+    FTabItems: TList;
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
     FOnTabClick: TNotifyEvent;
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
-      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor
-      );
-    procedure DoSync;
+      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor);
     procedure SetTabIndex(AIndex: Integer);
     function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
   public
@@ -53,11 +57,8 @@ type
     function GetTabCloseRect(const ARect: TRect): TRect;
     function GetTabAt(X, Y: Integer): Integer;
     function TabCount: Integer;
-    function TabCaption(AIndex: Integer): string;
     procedure DoAddTab(const ACaption: string; AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
-    procedure DoDeleteAllTabs;
-    procedure DoSetTabColor(AIndex: Integer; AColor: TColor);
     property TabIndex: Integer read FTabIndex write SetTabIndex;
   protected
     procedure Paint; override;
@@ -95,13 +96,13 @@ begin
 
   FColorBg:= clBlack;
   FColorTabActive:= $808080;
-  FColorTabPassive:= $605050;
+  FColorTabPassive:= $786868;
   FColorTabOver:= $A08080;
   FColorBorderActive:= $A0A0A0;
   FColorBorderPassive:= $A07070;
-  FColorCloseBg:= clLtGray;
-  FColorCloseBgOver:= $5050E0;
-  FColorCloseX:= $606060;
+  FColorCloseBg:= clNone;
+  FColorCloseBgOver:= $6060E0;
+  FColorCloseX:= clLtGray;
 
   FTabAngle:= 5;
   FTabWidthMin:= 70;
@@ -131,16 +132,19 @@ begin
 
   FTabIndex:= 0;
   FTabIndexOver:= -1;
-
-  FTabList:= TStringList.Create;
-  FTabColors:= TList.Create;
+  FTabItems:= TList.Create;
 
   FOnTabClick:= nil;
 end;
 
 destructor TATTabs.Destroy;
+var
+  i: Integer;
 begin
-  FreeAndNil(FTabList);
+  for i:= FTabItems.Count-1 downto 0 do
+    TATTabData(FTabItems[i]).Free;
+  FreeAndNil(FTabItems);
+
   FreeAndNil(FBitmapText);
   FreeAndNil(FBitmap);
   inherited;
@@ -309,8 +313,11 @@ begin
   if FTabCloseButtons then
   begin
     RText:= GetTabCloseRect(ARect);
-    C.Brush.Color:= ATabCloseBg;
-    C.FillRect(RText);
+    if ATabCloseBg<>clNone then
+    begin
+      C.Brush.Color:= ATabCloseBg;
+      C.FillRect(RText);
+    end;  
 
     C.Pen.Color:= FColorCloseX;
     C.Pen.Width:= 2;
@@ -340,7 +347,7 @@ function TATTabs.GetTabWidth(NIndex: Integer; NMinSize, NMaxSize: Integer): Inte
 begin
   Canvas.Font.Assign(Self.Font);
   Result:=
-    Canvas.TextWidth(FTabList[NIndex]) +
+    Canvas.TextWidth(TATTabData(FTabItems[NIndex]).TabCaption) +
     2*(FTabAngle + FTabIndentLeft) +
     IfThen(FTabCloseButtons, FTabCloseSize*3);
 
@@ -358,7 +365,7 @@ var
   NLeft, i: Integer;
 begin
   NLeft:= FTabIndentInit+FTabAngle;
-  for i:= 0 to FTabList.Count-1 do
+  for i:= 0 to FTabItems.Count-1 do
   begin
     Result.Left:= NLeft;
     Result.Right:= Result.Left + GetTabWidth(i, FTabWidthMin, FTabWidthMax);
@@ -401,33 +408,33 @@ begin
   DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
 
   //paint passive tabs
-  for i:= 0 to FTabList.Count-1 do
+  for i:= 0 to FTabItems.Count-1 do
     if i<>FTabIndex then
     begin
       ARect:= GetTabRect(i);
       AColorClose:= GetTabCloseColor(i, ARect);
-      DoPaintTabTo(C, ARect, FTabList[i],
+      DoPaintTabTo(C, ARect, TATTabData(FTabItems[i]).TabCaption,
         IfThen(i=FTabIndexOver,
           FColorTabOver,
           FColorTabPassive),
         FColorBorderPassive,
         FColorBorderActive,
-        Integer(FTabColors[i]),
+        TATTabData(FTabItems[i]).TabColor,
         AColorClose
         );
     end;
 
   //paint active tab
   i:= FTabIndex;
-  if (i>=0) and (i<FTabList.Count) then
+  if (i>=0) and (i<FTabItems.Count) then
   begin
     ARect:= GetTabRect(i);
     AColorClose:= GetTabCloseColor(i, ARect);
-    DoPaintTabTo(C, ARect, FTabList[i],
+    DoPaintTabTo(C, ARect, TATTabData(FTabItems[i]).TabCaption,
       FColorTabActive,
       FColorBorderActive,
       FColorTabActive,
-      Integer(FTabColors[i]),
+      TATTabData(FTabItems[i]).TabColor,
       AColorClose);
   end;
 end;
@@ -439,7 +446,7 @@ var
 begin
   Result:= -1;
   Pnt:= Point(X, Y);
-  for i:= 0 to FTabList.Count-1 do
+  for i:= 0 to FTabItems.Count-1 do
     if PtInRect(GetTabRect(i), Pnt) then
     begin
       Result:= i;
@@ -486,80 +493,49 @@ begin
 end;
 
 
-procedure TATTabs.DoSync;
-begin
-  while FTabColors.Count > FTabList.Count do
-    FTabColors.Delete(FTabColors.Count-1);
-  while FTabColors.Count < FTabList.Count do
-    FTabColors.Add(Pointer(clNone));
-end;
-
 procedure TATTabs.DoAddTab(const ACaption: string; AColor: TColor = clNone);
+var
+  Data: TATTabData;
 begin
-  DoSync;
-  FTabList.Add(ACaption);
-  FTabColors.Add(Pointer(AColor));
+  Data:= TATTabData.Create;
+  Data.TabCaption:= ACaption;
+  Data.TabColor:= AColor;
+  FTabItems.Add(Data);
+
   Invalidate;
 end;
 
 procedure TATTabs.DoDeleteTab(AIndex: Integer);
 begin
-  DoSync;
-  if (AIndex>=0) and (AIndex<FTabList.Count) then
+  if (AIndex>=0) and (AIndex<FTabItems.Count) then
   begin
-    FTabList.Delete(AIndex);
-    FTabColors.Delete(AIndex);
+    TATTabData(FTabItems[AIndex]).Free;
+    FTabItems.Delete(AIndex);
 
     if FTabIndex>AIndex then
       Dec(FTabIndex)
     else
-    if (FTabIndex=AIndex) and (FTabIndex>0) and (FTabIndex>=FTabColors.Count) then
+    if (FTabIndex=AIndex) and (FTabIndex>0) and (FTabIndex>=FTabItems.Count) then
       Dec(FTabIndex); 
 
     Invalidate;
   end;
 end;
 
-procedure TATTabs.DoDeleteAllTabs;
-begin
-  FTabList.Clear;
-  FTabColors.Clear;
-  Invalidate;
-end;
-
-procedure TATTabs.DoSetTabColor(AIndex: Integer; AColor: TColor);
-begin
-  DoSync;
-  if (AIndex>=0) and (AIndex<FTabList.Count) then
-  begin
-    FTabColors[AIndex]:= Pointer(AColor);
-    Invalidate;
-  end;
-end;
-
 function TATTabs.TabCount: Integer;
 begin
-  Result:= FTabList.Count;
+  Result:= FTabItems.Count;
 end;
 
 procedure TATTabs.SetTabIndex(AIndex: Integer);
 begin
-  DoSync;
-  if (AIndex>=0) and (AIndex<FTabList.Count) then
+  if (AIndex>=0) and (AIndex<FTabItems.Count) then
   begin
     FTabIndex:= AIndex;
     if Assigned(FOnTabClick) then
       FOnTabClick(Self);
     Invalidate;
   end;
-end;
-
-function TATTabs.TabCaption(AIndex: Integer): string;
-begin
-  if (AIndex>=0) and (AIndex<FTabList.Count) then
-    Result:= FTabList[AIndex]
-  else
-    Result:= '';  
 end;
 
 
