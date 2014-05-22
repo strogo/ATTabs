@@ -31,11 +31,12 @@ type
     FTabAngle: Integer;
     FTabWidthMin: Integer;
     FTabWidthMax: Integer;
-    FTabIndentInit: Integer;
-    FTabIndentLeft: Integer;
-    FTabIndentTop: Integer;
-    FTabIndentBottom: Integer;
-    FTabIndentText: Integer;
+    FTabIndentInter: Integer; //space between nearest tabs (no need to angled tabs)
+    FTabIndentInit: Integer; //space between first tab and control edge
+    FTabIndentLeft: Integer; //space between text and tab left edge
+    FTabIndentText: Integer; //space between text and tab top edge
+    FTabIndentTop: Integer; //size of top empty (color bg) line
+    FTabIndentBottom: Integer; //size of bottom empty (colored with active tab) line
     FTabIndex: Integer;
     FTabIndexOver: Integer;
     FTabColorSize: Integer;
@@ -84,6 +85,7 @@ type
     property TabIndentLeft: Integer read FTabIndentLeft write FTabIndentLeft;
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
+    property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
     property TabCloseButtons: boolean read FTabCloseButtons write FTabCloseButtons;
     property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
@@ -123,6 +125,7 @@ begin
   FTabWidthMin:= 70;
   FTabWidthMax:= 200;
   FTabIndentLeft:= 8;
+  FTabIndentInter:= 0;
   FTabIndentInit:= 4;
   FTabIndentTop:= 4;
   FTabIndentBottom:= 6;
@@ -395,7 +398,7 @@ begin
 
   for i:= 0 to FTabItems.Count-1 do
   begin
-    Result.Left:= Result.Right;
+    Result.Left:= Result.Right + FTabIndentInter;
     Result.Right:= Result.Left +
       GetTabWidth(TATTabData(FTabItems[i]).TabCaption, FTabWidthMin, FTabWidthMax, FTabCloseButtons);
     if AIndex=i then Exit;
@@ -405,7 +408,7 @@ end;
 function TATTabs.GetTabRect_Plus: TRect;
 begin
   Result:= GetTabRect(TabCount-1);
-  Result.Left:= Result.Right;
+  Result.Left:= Result.Right + FTabIndentInter;
   Result.Right:= Result.Left + GetTabWidth(FTabPlusButtonCaption, 0, 0, false);
 end;
 

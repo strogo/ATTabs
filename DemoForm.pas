@@ -72,6 +72,7 @@ begin
   t0.Parent:= Self;
   t0.Align:= alBottom;
   t0.TabAngle:= 0;
+  t0.TabIndentInter:= 2;
   t0.DoAddTab('Tab', clNone);
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clGreen);
   t0.DoAddTab('Tab', clBlue);
