@@ -45,6 +45,7 @@ type
     function GetTabCount: Integer;
     procedure DoAddTab(const ACaption: string; AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
+    procedure DoDeleteAllTabs;
     procedure DoSetTabColor(AIndex: Integer; AColor: TColor);
   protected
     procedure Paint; override;
@@ -102,8 +103,8 @@ begin
 
   FBitmapText:= TBitmap.Create;
   FBitmapText.PixelFormat:= pf24bit;
-  FBitmapText.Width:= 300;
-  FBitmapText.Height:= 60;
+  FBitmapText.Width:= 600;
+  FBitmapText.Height:= 100;
 
   Font.Name:= 'Tahoma';
   Font.Color:= $E0E0E0;
@@ -433,6 +434,12 @@ begin
   end;
 end;
 
+procedure TATTabs.DoDeleteAllTabs;
+begin
+  FTabList.Clear;
+  FTabColors.Clear;
+end;
+
 procedure TATTabs.DoSetTabColor(AIndex: Integer; AColor: TColor);
 begin
   DoSyncColors;
@@ -447,5 +454,6 @@ function TATTabs.GetTabCount: Integer;
 begin
   Result:= FTabList.Count;
 end;  
+
 
 end.

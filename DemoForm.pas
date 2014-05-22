@@ -39,7 +39,7 @@ begin
   t.Width:= 600;
   t.Height:= 34;
 
-  t.TabAngle:= 5;
+  t.TabAngle:= 4;
   t.TabIndentText:= 0;
   t.TabIndentInit:= 20;
 
@@ -52,6 +52,13 @@ begin
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
+  t0.DoAddTab('Tab');
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww');
+
+  t0:= TATTabs.Create(Self);
+  t0.Parent:= Self;
+  t0.Align:= alBottom;
+  t0.TabAngle:= 0;
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww');
 end;
