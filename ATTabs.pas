@@ -35,8 +35,9 @@ type
     FTabIndentInit: Integer; //space between first tab and control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
     FTabIndentText: Integer; //space between text and tab top edge
-    FTabIndentTop: Integer; //size of top empty (color bg) line
-    FTabIndentBottom: Integer; //size of bottom empty (colored with active tab) line
+    FTabIndentTop: Integer; //height of top empty space (colored with bg)
+    FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
+    FTabIndentXRight: Integer; //space from "x" btn to right tab edge
     FTabIndex: Integer;
     FTabIndexOver: Integer;
     FTabColorSize: Integer;
@@ -65,7 +66,7 @@ type
       ACloseBtn: boolean): Integer;
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
-    function GetTabCloseRect(const ARect: TRect): TRect;
+    function GetTabXRect(const ARect: TRect): TRect;
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
@@ -130,6 +131,8 @@ begin
   FTabIndentTop:= 4;
   FTabIndentBottom:= 6;
   FTabIndentText:= 3;
+  FTabIndentXRight:= 5;
+
   FTabColorSize:= 3;
   FTabCloseButtons:= true;
   FTabCloseSize:= 5;
@@ -339,7 +342,7 @@ begin
   //"close" button
   if ACloseBtn then
   begin
-    RText:= GetTabCloseRect(ARect);
+    RText:= GetTabXRect(ARect);
     C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
     C.FillRect(RText);
 
@@ -353,12 +356,12 @@ begin
   end;
 end;
 
-function TATTabs.GetTabCloseRect(const ARect: TRect): TRect;
+function TATTabs.GetTabXRect(const ARect: TRect): TRect;
 var
   P: TPoint;
 begin
   P:= Point(
-    ARect.Right-FTabAngle-FTabCloseSize*2,
+    ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
     (ARect.Top+ARect.Bottom) div 2);
   Result:= Rect(
     P.X-FTabCloseSize,
@@ -375,7 +378,7 @@ begin
   Result:=
     Canvas.TextWidth(ACaption) +
     2*(FTabAngle + FTabIndentLeft) +
-    IfThen(ACloseBtn, FTabCloseSize*3);
+    IfThen(ACloseBtn, FTabIndentLeft+FTabIndentXRight);
 
   if AMaxSize>0 then
     if Result>AMaxSize then
@@ -422,7 +425,7 @@ begin
     begin
       P:= Mouse.CursorPos;
       P:= ScreenToClient(P);
-      if PtInRect(GetTabCloseRect(ARect), P) then
+      if PtInRect(GetTabXRect(ARect), P) then
         Result:= FColorCloseBgOver;
     end;
 end;
@@ -530,7 +533,7 @@ begin
     if FTabCloseButtons then
     begin
       R:= GetTabRect(FTabIndexOver);
-      R:= GetTabCloseRect(R);
+      R:= GetTabXRect(R);
       if PtInRect(R, Point(X, Y)) then
       begin
         DoDeleteTab(FTabIndexOver);

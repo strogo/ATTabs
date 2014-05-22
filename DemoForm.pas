@@ -41,13 +41,9 @@ begin
   t:= TATTabs.Create(Self);
   t.Parent:= Self;
   t.Align:= alTop;
-  t.Left:= 80;
-  t.Top:= 100;
-  t.Width:= 600;
-  t.Height:= 34;
+  t.Height:= 33;
   t.OnTabClick:= TabClick;
   t.OnTabPlusClick:= TabPlusClick;
-
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
   t.TabIndentInit:= 20;
@@ -75,7 +71,7 @@ begin
   t0.TabIndentInter:= 2;
   t0.DoAddTab('Tab', clNone);
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clGreen);
-  t0.DoAddTab('Tab', clBlue);
+  t0.DoAddTab('Tab middle len', clBlue);
 end;
 
 procedure TForm1.bAddClick(Sender: TObject);
