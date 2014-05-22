@@ -18,6 +18,7 @@ type
     TabObject: TObject;
     TabColor: TColor;
     TabModified: boolean;
+    TabWidth: Integer;
   end;
 
 type
@@ -420,13 +421,13 @@ begin
   Result.Top:= FTabIndentTop;
   Result.Bottom:= ClientHeight-FTabIndentBottom;
 
-  for i:= 0 to FTabList.Count-1 do
-  begin
-    Result.Left:= Result.Right + FTabIndentInter;
-    Result.Right:= Result.Left +
-      GetTabWidth(TATTabData(FTabList[i]).TabCaption, FTabWidthMin, FTabWidthMax, FTabCloseButtons);
-    if AIndex=i then Exit;
-  end;
+  if IsIndexOk(AIndex) then
+    for i:= 0 to FTabList.Count-1 do
+    begin
+      Result.Left:= Result.Right + FTabIndentInter;
+      Result.Right:= Result.Left + TATTabData(FTabList[i]).TabWidth;
+      if AIndex=i then Exit;
+    end;
 end;
 
 function TATTabs.GetTabRect_Plus: TRect;
@@ -585,7 +586,8 @@ begin
 end;
 
 
-procedure TATTabs.DoAddTab(const ACaption: string;
+procedure TATTabs.DoAddTab(
+  const ACaption: string;
   AObject: TObject = nil;
   AModified: boolean = false;
   AColor: TColor = clNone);
@@ -594,9 +596,11 @@ var
 begin
   Data:= TATTabData.Create;
   Data.TabCaption:= ACaption;
-  Data.TabColor:= AColor;
-  Data.TabModified:= AModified;
   Data.TabObject:= AObject;
+  Data.TabModified:= AModified;
+  Data.TabColor:= AColor;
+  Data.TabWidth:= GetTabWidth(ACaption, FTabWidthMin, FTabWidthMax, FTabCloseButtons);
+
   FTabList.Add(Data);
   Invalidate;
 end;
