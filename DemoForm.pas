@@ -13,15 +13,17 @@ type
     bCl: TButton;
     Button4: TButton;
     Button5: TButton;
-    Label1: TLabel;
+    Edit1: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
     procedure bClClick(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
   private
     { Private declarations }
+    LockEdit: boolean;
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
     procedure TabClose(Sender: TObject; ATabIndex: Integer;
@@ -109,11 +111,15 @@ end;
 
 procedure TForm1.TabClick(A: TObject);
 var
-  Data: TATTabData;
+  d: TATTabData;
 begin
-  Data:= t.GetTabData(t.TabIndex);
-  if Assigned(Data) then
-    Label1.Caption:= 'click: '+data.TabCaption;
+  d:= t.GetTabData(t.TabIndex);
+  LockEdit:= true;
+  if Assigned(d) then
+    Edit1.Text:= d.TabCaption
+  else
+    Edit1.Text:= '';  
+  LockEdit:= false;
 end;
 
 procedure TForm1.TabPlusClick(A: TObject);
@@ -135,6 +141,18 @@ begin
   ACanClose:= true; //Pos('Tab', s)>0;
   if not ACanClose then
     MessageBeep(mb_iconwarning);
+end;
+
+procedure TForm1.Edit1Change(Sender: TObject);
+var
+  d: TATTabData;
+begin
+  d:= t.GetTabData(t.tabIndex);
+  if d=nil then Exit;
+  if LockEdit then Exit;
+
+  d.TabCaption:= Edit1.Text;
+  t.DoUpdateTabWidth(t.tabIndex);
 end;
 
 end.

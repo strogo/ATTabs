@@ -15,13 +15,6 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
-    Left = 336
-    Top = 256
-    Width = 25
-    Height = 13
-    Caption = 'Tab?'
-  end
   object bAdd: TButton
     Left = 200
     Top = 192
@@ -66,5 +59,13 @@ object Form1: TForm1
     Caption = '>'
     TabOrder = 4
     OnClick = Button5Click
+  end
+  object Edit1: TEdit
+    Left = 336
+    Top = 256
+    Width = 145
+    Height = 21
+    TabOrder = 5
+    OnChange = Edit1Change
   end
 end

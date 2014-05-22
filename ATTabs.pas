@@ -76,7 +76,7 @@ type
       ACloseBtn: boolean): Integer;
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
-    function GetTabXRect(const ARect: TRect): TRect;
+    function GetTabRect_X(const ARect: TRect): TRect;
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
@@ -85,6 +85,7 @@ type
       AModified: boolean = false;
       AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
+    procedure DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
     property TabIndex: Integer read FTabIndex write SetTabIndex;
   protected
     procedure Paint; override;
@@ -364,7 +365,7 @@ begin
   //"close" button
   if ACloseBtn then
   begin
-    RText:= GetTabXRect(ARect);
+    RText:= GetTabRect_X(ARect);
     C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
     C.FillRect(RText);
 
@@ -378,7 +379,7 @@ begin
   end;
 end;
 
-function TATTabs.GetTabXRect(const ARect: TRect): TRect;
+function TATTabs.GetTabRect_X(const ARect: TRect): TRect;
 var
   P: TPoint;
 begin
@@ -447,7 +448,7 @@ begin
     begin
       P:= Mouse.CursorPos;
       P:= ScreenToClient(P);
-      if PtInRect(GetTabXRect(ARect), P) then
+      if PtInRect(GetTabRect_X(ARect), P) then
         Result:= FColorCloseBgOver;
     end;
 end;
@@ -555,7 +556,7 @@ begin
     if FTabCloseButtons then
     begin
       R:= GetTabRect(FTabIndexOver);
-      R:= GetTabXRect(R);
+      R:= GetTabRect_X(R);
       if PtInRect(R, Point(X, Y)) then
       begin
         DoDeleteTab(FTabIndexOver);
@@ -619,11 +620,15 @@ begin
     TObject(FTabList[AIndex]).Free;
     FTabList.Delete(AIndex);
 
+    //need to call OnTabClick
     if FTabIndex>AIndex then
-      Dec(FTabIndex)
+      SetTabIndex(FTabIndex-1)
     else
     if (FTabIndex=AIndex) and (FTabIndex>0) and (FTabIndex>=FTabList.Count) then
-      Dec(FTabIndex); 
+      SetTabIndex(FTabIndex-1)
+    else
+    if FTabIndex=AIndex then
+      SetTabIndex(FTabIndex);
 
     Invalidate;
   end;
@@ -639,9 +644,9 @@ begin
   if IsIndexOk(AIndex) then
   begin
     FTabIndex:= AIndex;
+    Invalidate;
     if Assigned(FOnTabClick) then
       FOnTabClick(Self);
-    Invalidate;
   end;
 end;
 
@@ -660,5 +665,21 @@ begin
   Message.Result:= 1;
 end;
 {$endif}
+
+procedure TATTabs.DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
+var
+  Data: TATTabData;
+begin
+  if IsIndexOk(AIndex) then
+  begin
+    Data:= TATTabData(FTabList[AIndex]);
+    if ANewWidth>0 then
+      Data.TabWidth:= ANewWidth
+    else
+      Data.TabWidth:= GetTabWidth(Data.TabCaption, FTabWidthMin, FTabWidthMax, FTabCloseButtons);
+    Invalidate;  
+  end;
+end;
+
 
 end.
