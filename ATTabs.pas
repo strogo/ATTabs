@@ -26,7 +26,7 @@ type
     FTabIndentText: Integer;
     FTabIndex: Integer;
     FTabIndexOver: Integer;
-    FTabColorRadius: Integer;
+    FTabColorWidth: Integer;
     FTabList: TStringList;
     FTabColors: TList;
     FBitmap: TBitmap;
@@ -98,8 +98,8 @@ begin
   FTabIndentInit:= 4;
   FTabIndentTop:= 4;
   FTabIndentBottom:= 6;
-  FTabIndentText:= 2;
-  FTabColorRadius:= 6;
+  FTabIndentText:= 3;
+  FTabColorWidth:= 3;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -113,7 +113,7 @@ begin
 
   Font.Name:= 'Tahoma';
   Font.Color:= $E0E0E0;
-  Font.Size:= 10;
+  Font.Size:= 8;
 
   FTabIndex:= 0;
   FTabIndexOver:= -1;
@@ -280,16 +280,23 @@ begin
   DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
   DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X, ARect.Bottom, ATabBorderLow);
 
+  //tweak for border corners
+  C.Pixels[PL1.X, PL1.Y]:= FColorBg;
+  C.Pixels[PR1.X, PR1.Y]:= FColorBg;
+
   //color mark
   if ATabHilite<>clNone then
   begin
-    PL1:= Point(ARect.Right-FTabAngle-FTabColorRadius, (ARect.Top+ARect.Bottom) div 2);
     C.Brush.Color:= ATabHilite;
+    {
+    PL1:= Point(ARect.Right-FTabAngle-FTabColorRadius, (ARect.Top+ARect.Bottom) div 2);
     C.Ellipse(
       PL1.X-FTabColorRadius,
       PL1.Y-FTabColorRadius,
       PL1.X+FTabColorRadius,
       PL1.Y+FTabColorRadius);
+      }
+    C.FillRect(Rect(PL1.X+1, PL1.Y+1, PR1.X, PR1.Y+1+FTabColorWidth));
   end;
 end;
 

@@ -66,8 +66,8 @@ begin
   t0.Parent:= Self;
   t0.Align:= alBottom;
   t0.TabAngle:= 0;
-  t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww');
+  t0.DoAddTab('Tab', clRed);
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww', clGreen);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
