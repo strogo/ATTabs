@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 303
   Top = 282
   AutoScroll = False
-  Caption = 'FormDemo'
+  Caption = 'ATTabs demo'
   ClientHeight = 381
   ClientWidth = 716
   Color = clBtnFace

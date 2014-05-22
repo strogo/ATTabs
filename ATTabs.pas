@@ -60,7 +60,8 @@ type
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
-    procedure DoAddTab(const ACaption: string; AColor: TColor = clNone);
+    procedure DoAddTab(const ACaption: string; AColor: TColor = clNone;
+      AModified: boolean = false; AObject: TObject = nil);
     procedure DoDeleteTab(AIndex: Integer);
     property TabIndex: Integer read FTabIndex write SetTabIndex;
   protected
@@ -498,15 +499,17 @@ begin
 end;
 
 
-procedure TATTabs.DoAddTab(const ACaption: string; AColor: TColor = clNone);
+procedure TATTabs.DoAddTab(const ACaption: string; AColor: TColor = clNone;
+  AModified: boolean = false; AObject: TObject = nil);
 var
   Data: TATTabData;
 begin
   Data:= TATTabData.Create;
   Data.TabCaption:= ACaption;
   Data.TabColor:= AColor;
+  Data.TabModified:= AModified;
+  Data.TabObject:= AObject;
   FTabItems.Add(Data);
-
   Invalidate;
 end;
 

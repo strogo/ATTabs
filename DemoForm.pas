@@ -83,8 +83,12 @@ begin
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
+var
+  Data: TATTabData;
 begin
-  //t.DoSetTabColor(1, Random(60000));
+  Data:= t.GetTabData(t.tabindex);
+  Data.TabColor:= Random(60000);
+  t.Invalidate;
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
