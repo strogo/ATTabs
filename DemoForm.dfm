@@ -22,32 +22,32 @@ object Form1: TForm1
     Height = 13
     Caption = 'Tab?'
   end
-  object Button1: TButton
+  object bAdd: TButton
     Left = 200
     Top = 192
     Width = 75
     Height = 25
     Caption = 'add'
     TabOrder = 0
-    OnClick = Button1Click
+    OnClick = bAddClick
   end
-  object Button2: TButton
+  object bDel: TButton
     Left = 280
     Top = 192
     Width = 75
     Height = 25
     Caption = 'del'
     TabOrder = 1
-    OnClick = Button2Click
+    OnClick = bDelClick
   end
-  object Button3: TButton
+  object bCl: TButton
     Left = 360
     Top = 192
     Width = 75
     Height = 25
     Caption = 'color'
     TabOrder = 2
-    OnClick = Button3Click
+    OnClick = bClClick
   end
   object Button4: TButton
     Left = 336

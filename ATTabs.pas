@@ -41,21 +41,29 @@ type
     FTabColorSize: Integer;
     FTabCloseSize: Integer;
     FTabCloseButtons: boolean;
+    FTabPlusButton: boolean;
+    FTabPlusButtonCaption: string;
+    FTabPlusButtonSize: Integer;
     FTabItems: TList;
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
     FOnTabClick: TNotifyEvent;
+    FOnTabPlusClick: TNotifyEvent;
+    FOnTabClose: TNotifyEvent;
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
-      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor);
+      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
+      ACloseBtn: boolean);
     procedure SetTabIndex(AIndex: Integer);
     function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
-    function GetTabWidth(AIndex: Integer; AMinSize, AMaxSize: Integer): Integer;
+    function GetTabWidth(const ACaption: string; AMinSize, AMaxSize: Integer;
+      ACloseBtn: boolean): Integer;
     function GetTabRect(AIndex: Integer): TRect;
+    function GetTabRect_Plus: TRect;
     function GetTabCloseRect(const ARect: TRect): TRect;
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
@@ -77,7 +85,10 @@ type
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
     property TabCloseButtons: boolean read FTabCloseButtons write FTabCloseButtons;
+    property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
+    property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
+    property OnTabClose: TNotifyEvent read FOnTabClose write FOnTabClose;
   end;
 
 implementation
@@ -119,6 +130,9 @@ begin
   FTabColorSize:= 3;
   FTabCloseButtons:= true;
   FTabCloseSize:= 5;
+  FTabPlusButton:= true;
+  FTabPlusButtonCaption:= '+';
+  FTabPlusButtonSize:= 35;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -259,7 +273,8 @@ end;
 
 procedure TATTabs.DoPaintTabTo(C: TCanvas; ARect: TRect;
   const ACaption: string;
-  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor);
+  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
+  ACloseBtn: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
   RText: TRect;
@@ -319,7 +334,7 @@ begin
   end;
 
   //"close" button
-  if FTabCloseButtons then
+  if ACloseBtn then
   begin
     RText:= GetTabCloseRect(ARect);
     C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
@@ -349,13 +364,15 @@ begin
     P.Y+FTabCloseSize);
 end;
 
-function TATTabs.GetTabWidth(AIndex: Integer; AMinSize, AMaxSize: Integer): Integer;
+function TATTabs.GetTabWidth(const ACaption: string;
+  AMinSize, AMaxSize: Integer;
+  ACloseBtn: boolean): Integer;
 begin
   Canvas.Font.Assign(Self.Font);
   Result:=
-    Canvas.TextWidth(TATTabData(FTabItems[AIndex]).TabCaption) +
+    Canvas.TextWidth(ACaption) +
     2*(FTabAngle + FTabIndentLeft) +
-    IfThen(FTabCloseButtons, FTabCloseSize*3);
+    IfThen(ACloseBtn, FTabCloseSize*3);
 
   if AMaxSize>0 then
     if Result>AMaxSize then
@@ -366,20 +383,30 @@ begin
       Result:= AMinSize;
 end;
 
+
 function TATTabs.GetTabRect(AIndex: Integer): TRect;
 var
-  NLeft, i: Integer;
+  i: Integer;
 begin
-  NLeft:= FTabIndentInit+FTabAngle;
+  Result.Left:= FTabIndentInit+FTabAngle;
+  Result.Right:= Result.Left;
+  Result.Top:= FTabIndentTop;
+  Result.Bottom:= ClientHeight-FTabIndentBottom;
+
   for i:= 0 to FTabItems.Count-1 do
   begin
-    Result.Left:= NLeft;
-    Result.Right:= Result.Left + GetTabWidth(i, FTabWidthMin, FTabWidthMax);
-    Result.Top:= FTabIndentTop;
-    Result.Bottom:= ClientHeight-FTabIndentBottom;
-    NLeft:= Result.Right;
+    Result.Left:= Result.Right;
+    Result.Right:= Result.Left +
+      GetTabWidth(TATTabData(FTabItems[i]).TabCaption, FTabWidthMin, FTabWidthMax, FTabCloseButtons);
     if AIndex=i then Exit;
   end;
+end;
+
+function TATTabs.GetTabRect_Plus: TRect;
+begin
+  Result:= GetTabRect(TabCount-1);
+  Result.Left:= Result.Right;
+  Result.Right:= Result.Left + GetTabWidth(FTabPlusButtonCaption, 0, 0, false);
 end;
 
 function TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
@@ -420,15 +447,29 @@ begin
       ARect:= GetTabRect(i);
       AColorClose:= GetTabCloseColor(i, ARect);
       DoPaintTabTo(C, ARect, TATTabData(FTabItems[i]).TabCaption,
-        IfThen(i=FTabIndexOver,
-          FColorTabOver,
-          FColorTabPassive),
+        IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
         FColorBorderPassive,
         FColorBorderActive,
         TATTabData(FTabItems[i]).TabColor,
-        AColorClose
+        AColorClose,
+        FTabCloseButtons
         );
     end;
+
+  //paint "+" tab
+  if FTabPlusButton then
+  begin
+    ARect:= GetTabRect_Plus;
+    AColorClose:= clNone;
+    DoPaintTabTo(C, ARect, FTabPlusButtonCaption,
+      IfThen(FTabIndexOver=-2, FColorTabOver, FColorTabPassive),
+      FColorBorderPassive,
+      FColorBorderActive,
+      clNone,
+      AColorClose,
+      false
+      );
+  end;
 
   //paint active tab
   i:= FTabIndex;
@@ -441,7 +482,9 @@ begin
       FColorBorderActive,
       FColorTabActive,
       TATTabData(FTabItems[i]).TabColor,
-      AColorClose);
+      AColorClose,
+      FTabCloseButtons
+      );
   end;
 end;
 
@@ -452,12 +495,17 @@ var
 begin
   Result:= -1;
   Pnt:= Point(X, Y);
+
   for i:= 0 to FTabItems.Count-1 do
     if PtInRect(GetTabRect(i), Pnt) then
     begin
       Result:= i;
-      Break;
+      Exit;
     end;
+
+  if FTabPlusButton then
+    if PtInRect(GetTabRect_Plus, Pnt) then
+      Result:= -2;
 end;
 
 procedure TATTabs.MouseDown(Button: TMouseButton; Shift: TShiftState;
@@ -466,6 +514,14 @@ var
   R: TRect;
 begin
   FTabIndexOver:= GetTabAt(X, Y);
+
+  if FTabIndexOver=-2 then
+  begin
+    if Assigned(FOnTabPlusClick) then
+      FOnTabPlusClick(Self);
+    Exit;  
+  end;
+
   if FTabIndexOver>=0 then
   begin
     if FTabCloseButtons then

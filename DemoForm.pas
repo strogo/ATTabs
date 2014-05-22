@@ -8,21 +8,22 @@ uses
 
 type
   TForm1 = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
+    bAdd: TButton;
+    bDel: TButton;
+    bCl: TButton;
     Button4: TButton;
     Button5: TButton;
     Label1: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
+    procedure bAddClick(Sender: TObject);
+    procedure bDelClick(Sender: TObject);
+    procedure bClClick(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
     procedure TabClick(A: TObject);
+    procedure TabPlusClick(A: TObject);
   public
     { Public declarations }
     t, t0: TATTabs;
@@ -45,6 +46,7 @@ begin
   t.Width:= 600;
   t.Height:= 34;
   t.OnTabClick:= TabClick;
+  t.OnTabPlusClick:= TabPlusClick;
 
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
@@ -56,13 +58,16 @@ begin
   t.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clBlue);
   t.DoAddTab('i');
 
+  //angle
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
   t0.Tabclosebuttons:= false;
+  t0.TabPlusButton:= false;
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
 
+  //rectangle
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
@@ -72,17 +77,17 @@ begin
   t0.DoAddTab('Tab', clBlue);
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.bAddClick(Sender: TObject);
 begin
   t.DoAddTab('test '+Inttostr(t.TabCount+1), Random(65000));
 end;
 
-procedure TForm1.Button2Click(Sender: TObject);
+procedure TForm1.bDelClick(Sender: TObject);
 begin
   t.DoDeleteTab(1);
 end;
 
-procedure TForm1.Button3Click(Sender: TObject);
+procedure TForm1.bClClick(Sender: TObject);
 var
   Data: TATTabData;
 begin
@@ -109,5 +114,11 @@ begin
   if Assigned(Data) then
     Label1.Caption:= 'click: '+data.TabCaption;
 end;
+
+procedure TForm1.TabPlusClick(A: TObject);
+begin
+  bAdd.Click;
+end;
+
 
 end.
