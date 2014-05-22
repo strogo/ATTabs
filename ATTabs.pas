@@ -31,22 +31,26 @@ type
     FTabColors: TList;
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
+    FOnTabClick: TNotifyEvent;
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite: TColor;
       const ACaption: string);
     procedure DoSyncColors;
+    procedure SetTabIndex(AIndex: Integer);
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
     function GetTabWidth(NIndex: Integer; NMinSize, NMaxSize: Integer): Integer;
     function GetTabRect(NIndex: Integer): TRect;
     function GetTabAt(X, Y: Integer): Integer;
-    function GetTabCount: Integer;
+    function TabCount: Integer;
+    function TabCaption(AIndex: Integer): string;
     procedure DoAddTab(const ACaption: string; AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
     procedure DoDeleteAllTabs;
     procedure DoSetTabColor(AIndex: Integer; AColor: TColor);
+    property TabIndex: Integer read FTabIndex write SetTabIndex;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -59,6 +63,7 @@ type
     property TabIndentLeft: Integer read FTabIndentLeft write FTabIndentLeft;
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
+    property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
   end;
 
 implementation
@@ -115,6 +120,8 @@ begin
 
   FTabList:= TStringList.Create;
   FTabColors:= TList.Create;
+
+  FOnTabClick:= nil;
 end;
 
 destructor TATTabs.Destroy;
@@ -380,7 +387,7 @@ begin
   NOver:= GetTabAt(X, Y);
   if NOver>=0 then
   begin
-    FTabIndex:= NOver;
+    SetTabIndex(NOver);
     Invalidate;
   end;
 end;
@@ -438,6 +445,7 @@ procedure TATTabs.DoDeleteAllTabs;
 begin
   FTabList.Clear;
   FTabColors.Clear;
+  Invalidate;
 end;
 
 procedure TATTabs.DoSetTabColor(AIndex: Integer; AColor: TColor);
@@ -450,10 +458,30 @@ begin
   end;
 end;
 
-function TATTabs.GetTabCount: Integer;
+function TATTabs.TabCount: Integer;
 begin
   Result:= FTabList.Count;
-end;  
+end;
+
+procedure TATTabs.SetTabIndex(AIndex: Integer);
+begin
+  DoSyncColors;
+  if (AIndex>=0) and (AIndex<FTabList.Count) then
+  begin
+    FTabIndex:= AIndex;
+    if Assigned(FOnTabClick) then
+      FOnTabClick(Self);
+    Invalidate;
+  end;
+end;
+
+function TATTabs.TabCaption(AIndex: Integer): string;
+begin
+  if (AIndex>=0) and (AIndex<FTabList.Count) then
+    Result:= FTabList[AIndex]
+  else
+    Result:= '';  
+end;
 
 
 end.

@@ -11,12 +11,18 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
+    Button4: TButton;
+    Button5: TButton;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
+    procedure TabClick(A: TObject);
   public
     { Public declarations }
     t, t0: TATTabs;
@@ -38,6 +44,7 @@ begin
   t.Top:= 100;
   t.Width:= 600;
   t.Height:= 34;
+  t.OnTabClick:= TabClick;
 
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
@@ -65,7 +72,7 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  t.DoAddTab('test '+Inttostr(t.GetTabCount+1), Random(65000));
+  t.DoAddTab('test '+Inttostr(t.TabCount+1), Random(65000));
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -76,6 +83,21 @@ end;
 procedure TForm1.Button3Click(Sender: TObject);
 begin
   t.DoSetTabColor(1, Random(60000));
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+begin
+  t.tabIndex:= t.TabIndex-1;
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+begin
+  t.tabIndex:= t.TabIndex+1;
+end;
+
+procedure TForm1.TabClick(A: TObject);
+begin
+  Label1.Caption:= 'click: '+t.tabcaption(t.tabindex);
 end;
 
 end.
