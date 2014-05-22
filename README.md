@@ -7,4 +7,4 @@ Currently DEEP alpha.
 Each tab has props: Caption, Color, TObject, Modified.  
 Sample look of tabs:
 
-![img](img\ATTabs1.png)
+![img](Demo1.png?raw=true)
