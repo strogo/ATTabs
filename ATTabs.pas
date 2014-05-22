@@ -3,7 +3,11 @@ unit ATTabs;
 interface
 
 uses
-  Windows,
+  {$ifndef FPC}
+  Windows, Messages,
+  {$else}
+  LCLIntf,
+  {$endif}
   Classes, Types, Graphics,
   Controls, ExtCtrls;
 
@@ -11,9 +15,9 @@ type
   TATTabData = class
   public
     TabCaption: string;
+    TabObject: TObject;
     TabColor: TColor;
     TabModified: boolean;
-    TabObject: TObject;
   end;
 
 type
@@ -86,6 +90,9 @@ type
     procedure Resize; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    {$ifndef FPC}
+    procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
+    {$endif}
   published
     property TabAngle: Integer read FTabAngle write FTabAngle;
     property TabIndentTop: Integer read FTabIndentTop write FTabIndentTop;
@@ -643,5 +650,11 @@ begin
     Result:= nil;
 end;
 
+{$ifndef FPC}
+procedure TATTabs.WMEraseBkgnd(var Message: TMessage);
+begin
+  Message.Result:= 1;
+end;
+{$endif}
 
 end.
