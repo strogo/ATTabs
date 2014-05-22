@@ -564,8 +564,12 @@ end;
 procedure TATTabs.Resize;
 begin
   inherited;
-  FBitmap.Width:= Width;
-  FBitmap.Height:= Height;
+  
+  if Assigned(FBitmap) then
+  begin
+    if Width>20 then FBitmap.Width:= Width;
+    if Height>10 then FBitmap.Height:= Height;
+  end;  
 end;
 
 

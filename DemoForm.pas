@@ -132,7 +132,7 @@ begin
   if d=nil then Exit;
   s:= d.TabCaption;
 
-  ACanClose:= Pos('Tab', s)>0;
+  ACanClose:= true; //Pos('Tab', s)>0;
   if not ACanClose then
     MessageBeep(mb_iconwarning);
 end;
