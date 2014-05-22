@@ -47,11 +47,12 @@ begin
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
   t.TabIndentInit:= 20;
+  //t.TabIndentXRight:= 30;
 
   t.DoAddTab('Tab');
   t.DoAddTab('I');
-  t.DoAddTab('Tab three', clGreen);
-  t.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clBlue);
+  t.DoAddTab('Tab three', nil, false, clGreen);
+  t.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clBlue);
   t.DoAddTab('i');
 
   //angle
@@ -69,14 +70,14 @@ begin
   t0.Align:= alBottom;
   t0.TabAngle:= 0;
   t0.TabIndentInter:= 2;
-  t0.DoAddTab('Tab', clNone);
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clGreen);
-  t0.DoAddTab('Tab middle len', clBlue);
+  t0.DoAddTab('Tab');
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);
+  t0.DoAddTab('Tab middle len', nil, false, clBlue);
 end;
 
 procedure TForm1.bAddClick(Sender: TObject);
 begin
-  t.DoAddTab('test '+Inttostr(t.TabCount+1), Random(65000));
+  t.DoAddTab('test '+StringOfChar('n', Random(20)), nil, false, Random(65000));
 end;
 
 procedure TForm1.bDelClick(Sender: TObject);

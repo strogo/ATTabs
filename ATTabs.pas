@@ -70,8 +70,10 @@ type
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
-    procedure DoAddTab(const ACaption: string; AColor: TColor = clNone;
-      AModified: boolean = false; AObject: TObject = nil);
+    procedure DoAddTab(const ACaption: string;
+      AObject: TObject = nil;
+      AModified: boolean = false;
+      AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
     property TabIndex: Integer read FTabIndex write SetTabIndex;
   protected
@@ -87,6 +89,7 @@ type
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
     property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
+    property TabIndentXRight: Integer read FTabIndentXRight write FTabIndentXRight;
     property TabCloseButtons: boolean read FTabCloseButtons write FTabCloseButtons;
     property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
@@ -284,7 +287,7 @@ procedure TATTabs.DoPaintTabTo(C: TCanvas; ARect: TRect;
 var
   PL1, PL2, PR1, PR2: TPoint;
   RText: TRect;
-  NIndent: Integer;
+  NIndentL, NIndentR: Integer;
 const
   cX = 2; //offset from [x] rectangle edge to "x" mark
 begin
@@ -294,10 +297,11 @@ begin
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
 
-  NIndent:= Max(FTabIndentLeft, FTabAngle);
+  NIndentL:= Max(FTabIndentLeft, FTabAngle);
+  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight);
   RText:= Rect(ARect.Left+FTabAngle, ARect.Top, ARect.Right-FTabAngle, ARect.Bottom);
   C.FillRect(RText);
-  RText:= Rect(ARect.Left+NIndent, ARect.Top, ARect.Right-NIndent, ARect.Bottom);
+  RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
 
   //left triangle
   PL1:= Point(ARect.Left+FTabAngle, ARect.Top);
@@ -561,8 +565,10 @@ begin
 end;
 
 
-procedure TATTabs.DoAddTab(const ACaption: string; AColor: TColor = clNone;
-  AModified: boolean = false; AObject: TObject = nil);
+procedure TATTabs.DoAddTab(const ACaption: string;
+  AObject: TObject = nil;
+  AModified: boolean = false;
+  AColor: TColor = clNone);
 var
   Data: TATTabData;
 begin
