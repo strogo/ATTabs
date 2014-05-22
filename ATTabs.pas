@@ -17,6 +17,10 @@ type
   end;
 
 type
+  TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
+    var ACanClose: boolean) of object;  
+
+type
   TATTabs = class(TPanel)
   private
     FColorBg: TColor;
@@ -51,7 +55,7 @@ type
     FBitmapText: TBitmap;
     FOnTabClick: TNotifyEvent;
     FOnTabPlusClick: TNotifyEvent;
-    FOnTabClose: TNotifyEvent;
+    FOnTabClose: TATTabCloseEvent;
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
@@ -94,7 +98,7 @@ type
     property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
     property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
-    property OnTabClose: TNotifyEvent read FOnTabClose write FOnTabClose;
+    property OnTabClose: TATTabCloseEvent read FOnTabClose write FOnTabClose;
   end;
 
 implementation
@@ -582,7 +586,14 @@ begin
 end;
 
 procedure TATTabs.DoDeleteTab(AIndex: Integer);
+var
+  CanClose: boolean;
 begin
+  CanClose:= true;
+  if Assigned(FOnTabClose) then
+    FOnTabClose(Self, AIndex, CanClose);
+  if not CanClose then Exit;  
+
   if (AIndex>=0) and (AIndex<FTabItems.Count) then
   begin
     TObject(FTabItems[AIndex]).Free;

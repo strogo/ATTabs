@@ -24,6 +24,8 @@ type
     { Private declarations }
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
+    procedure TabClose(Sender: TObject; ATabIndex: Integer;
+    var ACanClose: boolean);
   public
     { Public declarations }
     t, t0: TATTabs;
@@ -44,6 +46,7 @@ begin
   t.Height:= 33;
   t.OnTabClick:= TabClick;
   t.OnTabPlusClick:= TabPlusClick;
+  t.OnTabClose:= TabClose;
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
   t.TabIndentInit:= 20;
@@ -118,5 +121,20 @@ begin
   bAdd.Click;
 end;
 
+
+procedure TForm1.TabClose(Sender: TObject; ATabIndex: Integer;
+  var ACanClose: boolean);
+var
+  d: TATTabData;
+  s: string;
+begin
+  d:= (Sender as TATTabs).GetTabData(ATabIndex);
+  if d=nil then Exit;
+  s:= d.TabCaption;
+
+  ACanClose:= Pos('Tab', s)>0;
+  if not ACanClose then
+    MessageBeep(mb_iconwarning);
+end;
 
 end.
