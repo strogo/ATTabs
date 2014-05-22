@@ -61,14 +61,15 @@ begin
   t0.Align:= alBottom;
   t0.Tabclosebuttons:= false;
   t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww');
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
 
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
   t0.TabAngle:= 0;
   t0.DoAddTab('Tab', clNone);
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwww', clGreen);
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', clGreen);
+  t0.DoAddTab('Tab', clBlue);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -97,8 +98,12 @@ begin
 end;
 
 procedure TForm1.TabClick(A: TObject);
+var
+  Data: TATTabData;
 begin
-  Label1.Caption:= 'click: ';//+t.tabcaption(t.tabindex);
+  Data:= t.GetTabData(t.TabIndex);
+  if Assigned(Data) then
+    Label1.Caption:= 'click: '+data.TabCaption;
 end;
 
 end.

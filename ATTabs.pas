@@ -12,6 +12,8 @@ type
   public
     TabCaption: string;
     TabColor: TColor;
+    TabModified: boolean;
+    TabObject: TObject;
   end;
 
 type
@@ -52,10 +54,11 @@ type
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
-    function GetTabWidth(NIndex: Integer; NMinSize, NMaxSize: Integer): Integer;
-    function GetTabRect(NIndex: Integer): TRect;
+    function GetTabWidth(AIndex: Integer; AMinSize, AMaxSize: Integer): Integer;
+    function GetTabRect(AIndex: Integer): TRect;
     function GetTabCloseRect(const ARect: TRect): TRect;
     function GetTabAt(X, Y: Integer): Integer;
+    function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
     procedure DoAddTab(const ACaption: string; AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
@@ -142,7 +145,10 @@ var
   i: Integer;
 begin
   for i:= FTabItems.Count-1 downto 0 do
-    TATTabData(FTabItems[i]).Free;
+  begin
+    TObject(FTabItems[i]).Free;
+    FTabItems[i]:= nil;
+  end;
   FreeAndNil(FTabItems);
 
   FreeAndNil(FBitmapText);
@@ -257,6 +263,8 @@ var
   PL1, PL2, PR1, PR2: TPoint;
   RText: TRect;
   NIndent: Integer;
+const
+  cX = 2; //offset from [x] rectangle edge to "x" mark
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ARect);
@@ -313,18 +321,15 @@ begin
   if FTabCloseButtons then
   begin
     RText:= GetTabCloseRect(ARect);
-    if ATabCloseBg<>clNone then
-    begin
-      C.Brush.Color:= ATabCloseBg;
-      C.FillRect(RText);
-    end;  
+    C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
+    C.FillRect(RText);
 
     C.Pen.Color:= FColorCloseX;
     C.Pen.Width:= 2;
-    C.MoveTo(RText.Left+2, RText.Top+2);
-    C.LineTo(RText.Right-3, RText.Bottom-3);
-    C.MoveTo(RText.Left+2, RText.Bottom-3);
-    C.LineTo(RText.Right-3, RText.Top+2);
+    C.MoveTo(RText.Left+cX, RText.Top+cX);
+    C.LineTo(RText.Right-cX-1, RText.Bottom-cX-1);
+    C.MoveTo(RText.Left+cX, RText.Bottom-cX-1);
+    C.LineTo(RText.Right-cX-1, RText.Top+cX);
     C.Pen.Width:= 1;
   end;
 end;
@@ -343,24 +348,24 @@ begin
     P.Y+FTabCloseSize);
 end;
 
-function TATTabs.GetTabWidth(NIndex: Integer; NMinSize, NMaxSize: Integer): Integer;
+function TATTabs.GetTabWidth(AIndex: Integer; AMinSize, AMaxSize: Integer): Integer;
 begin
   Canvas.Font.Assign(Self.Font);
   Result:=
-    Canvas.TextWidth(TATTabData(FTabItems[NIndex]).TabCaption) +
+    Canvas.TextWidth(TATTabData(FTabItems[AIndex]).TabCaption) +
     2*(FTabAngle + FTabIndentLeft) +
     IfThen(FTabCloseButtons, FTabCloseSize*3);
 
-  if NMaxSize>0 then
-    if Result>NMaxSize then
-      Result:= NMaxSize;
+  if AMaxSize>0 then
+    if Result>AMaxSize then
+      Result:= AMaxSize;
 
-  if NMinSize>0 then
-    if Result<NMinSize then
-      Result:= NMinSize;
+  if AMinSize>0 then
+    if Result<AMinSize then
+      Result:= AMinSize;
 end;
 
-function TATTabs.GetTabRect(NIndex: Integer): TRect;
+function TATTabs.GetTabRect(AIndex: Integer): TRect;
 var
   NLeft, i: Integer;
 begin
@@ -372,7 +377,7 @@ begin
     Result.Top:= FTabIndentTop;
     Result.Bottom:= ClientHeight-FTabIndentBottom;
     NLeft:= Result.Right;
-    if NIndex=i then Exit;
+    if AIndex=i then Exit;
   end;
 end;
 
@@ -509,7 +514,7 @@ procedure TATTabs.DoDeleteTab(AIndex: Integer);
 begin
   if (AIndex>=0) and (AIndex<FTabItems.Count) then
   begin
-    TATTabData(FTabItems[AIndex]).Free;
+    TObject(FTabItems[AIndex]).Free;
     FTabItems.Delete(AIndex);
 
     if FTabIndex>AIndex then
@@ -538,5 +543,13 @@ begin
   end;
 end;
 
+
+function TATTabs.GetTabData(AIndex: Integer): TATTabData;
+begin
+  if (AIndex>=0) and (AIndex<FTabItems.Count) then
+    Result:= TATTabData(FTabItems[AIndex])
+  else
+    Result:= nil;
+end;
 
 end.
