@@ -10,16 +10,16 @@ type
   TForm1 = class(TForm)
     bAdd: TButton;
     bDel: TButton;
-    bCl: TButton;
-    Button4: TButton;
-    Button5: TButton;
+    bColor: TButton;
+    bLeft: TButton;
+    bRt: TButton;
     Edit1: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
-    procedure bClClick(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
+    procedure bColorClick(Sender: TObject);
+    procedure bLeftClick(Sender: TObject);
+    procedure bRtClick(Sender: TObject);
     procedure Edit1Change(Sender: TObject);
   private
     { Private declarations }
@@ -90,7 +90,7 @@ begin
   t.DoDeleteTab(1);
 end;
 
-procedure TForm1.bClClick(Sender: TObject);
+procedure TForm1.bColorClick(Sender: TObject);
 var
   Data: TATTabData;
 begin
@@ -99,12 +99,12 @@ begin
   t.Invalidate;
 end;
 
-procedure TForm1.Button4Click(Sender: TObject);
+procedure TForm1.bLeftClick(Sender: TObject);
 begin
   t.tabIndex:= t.TabIndex-1;
 end;
 
-procedure TForm1.Button5Click(Sender: TObject);
+procedure TForm1.bRtClick(Sender: TObject);
 begin
   t.tabIndex:= t.TabIndex+1;
 end;

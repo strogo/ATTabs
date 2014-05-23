@@ -48,14 +48,16 @@ type
     FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
     FTabIndentXRight: Integer; //space from "x" btn to right tab edge
     FTabIndentColor: Integer; //height of "misc color" line
-    FTabIndex: Integer;
-    FTabIndexOver: Integer;
     FTabCloseButtons: boolean;
     FTabCloseButtonSize: Integer;
     FTabPlusButton: boolean;
     FTabPlusButtonCaption: string;
     FTabPlusButtonSize: Integer;
+    
+    FTabIndex: Integer;
+    FTabIndexOver: Integer;
     FTabList: TList;
+    
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
     FOnTabClick: TNotifyEvent;
@@ -96,16 +98,35 @@ type
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
   published
+    //copied by multi-carets in Synwrite
+    //colors
+    property ColorBg: TColor read FColorBg write FColorBg;
+    property ColorBorderActive: TColor read FColorBorderActive write FColorBorderActive;
+    property ColorBorderPassive: TColor read FColorBorderPassive write FColorBorderPassive;
+    property ColorTabActive: TColor read FColorTabActive write FColorTabActive;
+    property ColorTabPassive: TColor read FColorTabPassive write FColorTabPassive;
+    property ColorTabOver: TColor read FColorTabOver write FColorTabOver;
+    property ColorCloseBg: TColor read FColorCloseBg write FColorCloseBg;
+    property ColorCloseBgOver: TColor read FColorCloseBgOver write FColorCloseBgOver;
+    property ColorCloseX: TColor read FColorCloseX write FColorCloseX;
+    //spaces
     property TabAngle: Integer read FTabAngle write FTabAngle;
-    property TabIndentTop: Integer read FTabIndentTop write FTabIndentTop;
-    property TabIndentBottom: Integer read FTabIndentBottom write FTabIndentBottom;
+    property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
+    property TabWidthMax: Integer read FTabWidthMax write FTabWidthMax;
+    property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
+    property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
     property TabIndentLeft: Integer read FTabIndentLeft write FTabIndentLeft;
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
-    property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
-    property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
+    property TabIndentTop: Integer read FTabIndentTop write FTabIndentTop;
+    property TabIndentBottom: Integer read FTabIndentBottom write FTabIndentBottom;
     property TabIndentXRight: Integer read FTabIndentXRight write FTabIndentXRight;
+    property TabIndentColor: Integer read FTabIndentColor write FTabIndentColor;
     property TabCloseButtons: boolean read FTabCloseButtons write FTabCloseButtons;
+    property TabCloseButtonSize: Integer read FTabCloseButtonSize write FTabCloseButtonSize;
     property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
+    property TabPlusButtonCaption: string read FTabPlusButtonCaption write FTabPlusButtonCaption;
+    property TabPlusButtonSize: Integer read FTabPlusButtonSize write FTabPlusButtonSize;
+    //events
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
     property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
     property OnTabClose: TATTabCloseEvent read FOnTabClose write FOnTabClose;

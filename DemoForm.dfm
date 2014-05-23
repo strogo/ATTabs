@@ -33,37 +33,37 @@ object Form1: TForm1
     TabOrder = 1
     OnClick = bDelClick
   end
-  object bCl: TButton
+  object bColor: TButton
     Left = 360
     Top = 192
     Width = 75
     Height = 25
     Caption = 'color'
     TabOrder = 2
-    OnClick = bClClick
+    OnClick = bColorClick
   end
-  object Button4: TButton
-    Left = 336
+  object bLeft: TButton
+    Left = 288
     Top = 224
     Width = 75
     Height = 25
     Caption = '<'
     TabOrder = 3
-    OnClick = Button4Click
+    OnClick = bLeftClick
   end
-  object Button5: TButton
-    Left = 416
+  object bRt: TButton
+    Left = 368
     Top = 224
     Width = 75
     Height = 25
     Caption = '>'
     TabOrder = 4
-    OnClick = Button5Click
+    OnClick = bRtClick
   end
   object Edit1: TEdit
-    Left = 336
+    Left = 288
     Top = 256
-    Width = 145
+    Width = 225
     Height = 21
     TabOrder = 5
     OnChange = Edit1Change
