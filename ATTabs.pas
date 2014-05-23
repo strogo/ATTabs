@@ -683,28 +683,39 @@ var
 begin
   FTabIndexOver:= GetTabAt(X, Y);
 
-  if FTabIndexOver=cAtTabPlus then
+  if Button=mbLeft then
   begin
-    if Assigned(FOnTabPlusClick) then
-      FOnTabPlusClick(Self);
-    Exit;  
-  end;
+    case FTabIndexOver of
+      cAtArrowLeft,
+      cAtArrowRight,
+      cAtArrowDown:
+        begin
+          Beep;
+          Exit
+        end;
 
-  if FTabIndexOver>=0 then
-  begin
-    if FTabButtonClose then
-    begin
-      R:= GetTabRect(FTabIndexOver);
-      R:= GetTabRect_X(R);
-      if PtInRect(R, Point(X, Y)) then
-      begin
-        DoDeleteTab(FTabIndexOver);
-        Exit
-      end;
+      cAtTabPlus:
+        begin
+          if Assigned(FOnTabPlusClick) then
+            FOnTabPlusClick(Self);
+          Exit;
+        end;
+
+      else
+        begin
+          if FTabButtonClose then
+          begin
+            R:= GetTabRect(FTabIndexOver);
+            R:= GetTabRect_X(R);
+            if PtInRect(R, Point(X, Y)) then
+            begin
+              DoDeleteTab(FTabIndexOver);
+              Exit
+            end;
+          end;
+          SetTabIndex(FTabIndexOver);
+        end;
     end;
-
-    SetTabIndex(FTabIndexOver);
-    Invalidate;
   end;
 end;
 
