@@ -47,9 +47,10 @@ type
     FTabIndentTop: Integer; //height of top empty space (colored with bg)
     FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
     FTabIndentXRight: Integer; //space from "x" btn to right tab edge
+    FTabIndentXInner: Integer; //space from "x" square edge to "x" mark
+    FTabIndentXSize: Integer; //half-size of "x" mark
     FTabIndentColor: Integer; //height of "misc color" line
     FTabCloseButtons: boolean;
-    FTabCloseButtonSize: Integer;
     FTabPlusButton: boolean;
     FTabPlusButtonCaption: string;
     FTabPlusButtonSize: Integer;
@@ -120,9 +121,10 @@ type
     property TabIndentTop: Integer read FTabIndentTop write FTabIndentTop;
     property TabIndentBottom: Integer read FTabIndentBottom write FTabIndentBottom;
     property TabIndentXRight: Integer read FTabIndentXRight write FTabIndentXRight;
+    property TabIndentXInner: Integer read FTabIndentXInner write FTabIndentXInner;
+    property TabIndentXSize: Integer read FTabIndentXSize write FTabIndentXSize;
     property TabIndentColor: Integer read FTabIndentColor write FTabIndentColor;
     property TabCloseButtons: boolean read FTabCloseButtons write FTabCloseButtons;
-    property TabCloseButtonSize: Integer read FTabCloseButtonSize write FTabCloseButtonSize;
     property TabPlusButton: boolean read FTabPlusButton write FTabPlusButton;
     property TabPlusButtonCaption: string read FTabPlusButtonCaption write FTabPlusButtonCaption;
     property TabPlusButtonSize: Integer read FTabPlusButtonSize write FTabPlusButtonSize;
@@ -175,10 +177,11 @@ begin
   FTabIndentBottom:= 6;
   FTabIndentText:= 3;
   FTabIndentXRight:= 5;
+  FTabIndentXInner:= 3;
+  FTabIndentXSize:= 6;
 
   FTabIndentColor:= 3;
   FTabCloseButtons:= true;
-  FTabCloseButtonSize:= 5;
   FTabPlusButton:= true;
   FTabPlusButtonCaption:= '+';
   FTabPlusButtonSize:= 35;
@@ -328,8 +331,6 @@ var
   PL1, PL2, PR1, PR2: TPoint;
   RText: TRect;
   NIndentL, NIndentR: Integer;
-const
-  cX = 2; //offset from [x] rectangle edge to "x" mark
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ARect);
@@ -338,7 +339,7 @@ begin
   C.Brush.Color:= ATabBg;
 
   NIndentL:= Max(FTabIndentLeft, FTabAngle);
-  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabCloseButtonSize);
+  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabIndentXSize);
   RText:= Rect(ARect.Left+FTabAngle, ARect.Top, ARect.Right-FTabAngle, ARect.Bottom);
   C.FillRect(RText);
   RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
@@ -392,10 +393,10 @@ begin
 
     C.Pen.Color:= FColorCloseX;
     C.Pen.Width:= 2;
-    C.MoveTo(RText.Left+cX, RText.Top+cX);
-    C.LineTo(RText.Right-cX-1, RText.Bottom-cX-1);
-    C.MoveTo(RText.Left+cX, RText.Bottom-cX-1);
-    C.LineTo(RText.Right-cX-1, RText.Top+cX);
+    C.MoveTo(RText.Left+FTabIndentXInner, RText.Top+FTabIndentXInner);
+    C.LineTo(RText.Right-FTabIndentXInner-1, RText.Bottom-FTabIndentXInner-1);
+    C.MoveTo(RText.Left+FTabIndentXInner, RText.Bottom-FTabIndentXInner-1);
+    C.LineTo(RText.Right-FTabIndentXInner-1, RText.Top+FTabIndentXInner);
     C.Pen.Width:= 1;
   end;
 end;
@@ -408,10 +409,10 @@ begin
     ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
     (ARect.Top+ARect.Bottom) div 2);
   Result:= Rect(
-    P.X-FTabCloseButtonSize,
-    P.Y-FTabCloseButtonSize,
-    P.X+FTabCloseButtonSize,
-    P.Y+FTabCloseButtonSize);
+    P.X-FTabIndentXSize,
+    P.Y-FTabIndentXSize,
+    P.X+FTabIndentXSize,
+    P.Y+FTabIndentXSize);
 end;
 
 function TATTabs.GetTabWidth(const ACaption: string;
