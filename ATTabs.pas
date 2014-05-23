@@ -47,11 +47,11 @@ type
     FTabIndentTop: Integer; //height of top empty space (colored with bg)
     FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
     FTabIndentXRight: Integer; //space from "x" btn to right tab edge
+    FTabIndentColor: Integer; //height of "misc color" line
     FTabIndex: Integer;
     FTabIndexOver: Integer;
-    FTabColorSize: Integer;
-    FTabCloseSize: Integer;
     FTabCloseButtons: boolean;
+    FTabCloseButtonSize: Integer;
     FTabPlusButton: boolean;
     FTabPlusButtonCaption: string;
     FTabPlusButtonSize: Integer;
@@ -141,7 +141,7 @@ begin
   FColorBorderActive:= $A0A0A0;
   FColorBorderPassive:= $A07070;
   FColorCloseBg:= clNone;
-  FColorCloseBgOver:= $6060E0;
+  FColorCloseBgOver:= $6060F0;
   FColorCloseX:= clLtGray;
 
   FTabAngle:= 5;
@@ -155,22 +155,22 @@ begin
   FTabIndentText:= 3;
   FTabIndentXRight:= 5;
 
-  FTabColorSize:= 3;
+  FTabIndentColor:= 3;
   FTabCloseButtons:= true;
-  FTabCloseSize:= 5;
+  FTabCloseButtonSize:= 5;
   FTabPlusButton:= true;
   FTabPlusButtonCaption:= '+';
   FTabPlusButtonSize:= 35;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
-  FBitmap.Width:= Width;
-  FBitmap.Height:= Height;
+  FBitmap.Width:= 1600;
+  FBitmap.Height:= 60;
 
   FBitmapText:= TBitmap.Create;
   FBitmapText.PixelFormat:= pf24bit;
   FBitmapText.Width:= 600;
-  FBitmapText.Height:= 100;
+  FBitmapText.Height:= 60;
 
   Font.Name:= 'Tahoma';
   Font.Color:= $E0E0E0;
@@ -317,7 +317,7 @@ begin
   C.Brush.Color:= ATabBg;
 
   NIndentL:= Max(FTabIndentLeft, FTabAngle);
-  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight);
+  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabCloseButtonSize);
   RText:= Rect(ARect.Left+FTabAngle, ARect.Top, ARect.Right-FTabAngle, ARect.Bottom);
   C.FillRect(RText);
   RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
@@ -359,7 +359,7 @@ begin
   if ATabHilite<>clNone then
   begin
     C.Brush.Color:= ATabHilite;
-    C.FillRect(Rect(PL1.X+1, PL1.Y+1, PR1.X, PR1.Y+1+FTabColorSize));
+    C.FillRect(Rect(PL1.X+1, PL1.Y+1, PR1.X, PR1.Y+1+FTabIndentColor));
   end;
 
   //"close" button
@@ -387,10 +387,10 @@ begin
     ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
     (ARect.Top+ARect.Bottom) div 2);
   Result:= Rect(
-    P.X-FTabCloseSize,
-    P.Y-FTabCloseSize,
-    P.X+FTabCloseSize,
-    P.Y+FTabCloseSize);
+    P.X-FTabCloseButtonSize,
+    P.Y-FTabCloseButtonSize,
+    P.X+FTabCloseButtonSize,
+    P.Y+FTabCloseButtonSize);
 end;
 
 function TATTabs.GetTabWidth(const ACaption: string;

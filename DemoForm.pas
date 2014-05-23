@@ -57,7 +57,7 @@ begin
   t.DoAddTab('Tab');
   t.DoAddTab('I');
   t.DoAddTab('Tab three', nil, false, clGreen);
-  t.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clBlue);
+  t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
   t.DoAddTab('i');
 
   //angle
@@ -76,7 +76,7 @@ begin
   t0.TabAngle:= 0;
   t0.TabIndentInter:= 2;
   t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);
+  t0.DoAddTab('Tab _____________________________________________________', nil, false, clGreen);
   t0.DoAddTab('Tab middle len', nil, false, clBlue);
 end;
 
