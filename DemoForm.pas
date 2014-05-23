@@ -64,8 +64,8 @@ begin
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
-  t0.Tabclosebuttons:= false;
-  t0.TabPlusButton:= false;
+  t0.TabButtonclose:= false;
+  t0.TabButtonplus:= false;
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
 
