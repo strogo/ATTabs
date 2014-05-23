@@ -85,7 +85,8 @@ type
       const ACaption: string;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
       ACloseBtn: boolean);
-    procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect; AColor: TColor);
+    procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
+      AColorArr, AColorBg: TColor);
     procedure SetTabIndex(AIndex: Integer);
     function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
     function IsIndexOk(AIndex: Integer): boolean;
@@ -608,17 +609,15 @@ begin
   if FTabArrowLeft then
   begin
     DoPaintArrowTo(C, triLeft, AArrowLeft,
-      IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow));
+      IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow), FColorBg);
     DoPaintArrowTo(C, triRight, AArrowRight,
-      IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow));
+      IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow), FColorBg);
   end;
-    
+
   if FTabArrowDown then
   begin
-    C.Brush.Color:= FColorBg;
-    C.FillRect(AArrowDown);
     DoPaintArrowTo(C, triDown, AArrowDown,
-      IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow));
+      IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow), FColorBg);
   end;
 end;
 
@@ -818,7 +817,8 @@ begin
 end;
 
 
-procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect; AColor: TColor);
+procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
+  AColorArr, AColorBg: TColor);
 const
   cRatio = 0.866; //sqrt(3)/2
 var
@@ -826,6 +826,9 @@ var
   R: TRect;
   N, SizeX, SizeY: Integer;
 begin
+  C.Brush.Color:= AColorBg;
+  C.FillRect(ARect);
+
   N:= FTabIndentArrowSize;
   case ATyp of
     triLeft,
@@ -843,7 +846,7 @@ begin
 
   P:= CenterPoint(ARect);
   R:= Rect(P.X-SizeX, P.Y-SizeY, P.X+SizeX, P.Y+SizeY);
-  DrawTrinagle(C, ATyp, R, AColor);
+  DrawTrinagle(C, ATyp, R, AColorArr);
 end;
 
 
