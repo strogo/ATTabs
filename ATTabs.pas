@@ -68,7 +68,7 @@ type
     FTabButtonClose: boolean; //show "x" buttons
     FTabButtonPlus: boolean; //show "plus" tab
     FTabButtonPlusText: string; //text of "plus" tab
-    FTabArrowLeft: boolean; //show left/right arrows (scroll)
+    FTabArrowScroll: boolean; //show left/right arrows (scroll)
     FTabArrowDown: boolean; //show down arrow (menu of tabs)
 
     FTabIndex: Integer;
@@ -143,10 +143,14 @@ type
     property TabIndentXInner: Integer read FTabIndentXInner write FTabIndentXInner;
     property TabIndentXSize: Integer read FTabIndentXSize write FTabIndentXSize;
     property TabIndentColor: Integer read FTabIndentColor write FTabIndentColor;
+    property TabIndentArrowSize: Integer read FTabIndentArrowSize write FTabIndentArrowSize;
+    property TabIndentArrowLeft: Integer read FTabIndentArrowLeft write FTabIndentArrowLeft;
+    property TabIndentArrowRight: Integer read FTabIndentArrowRight write FTabIndentArrowRight;
+
     property TabButtonClose: boolean read FTabButtonClose write FTabButtonClose;
     property TabButtonPlus: boolean read FTabButtonPlus write FTabButtonPlus;
     property TabButtonPlusText: string read FTabButtonPlusText write FTabButtonPlusText;
-    property TabArrowLeft: boolean read FTabArrowLeft write FTabArrowLeft;
+    property TabArrowScroll: boolean read FTabArrowScroll write FTabArrowScroll;
     property TabArrowDown: boolean read FTabArrowDown write FTabArrowDown;
 
     //events
@@ -327,15 +331,15 @@ begin
   FTabIndentXRight:= 5;
   FTabIndentXInner:= 3;
   FTabIndentXSize:= 6;
-  FTabIndentArrowSize:= 5;
-  FTabIndentArrowLeft:= 10;
+  FTabIndentArrowSize:= 4;
+  FTabIndentArrowLeft:= 6;
   FTabIndentArrowRight:= 26;
 
   FTabIndentColor:= 3;
   FTabButtonClose:= true;
   FTabButtonPlus:= true;
   FTabButtonPlusText:= '+';
-  FTabArrowLeft:= true;
+  FTabArrowScroll:= true;
   FTabArrowDown:= true;
 
   FBitmap:= TBitmap.Create;
@@ -606,7 +610,7 @@ begin
   //paint arrows
   GetArrowRect(AArrowLeft, AArrowRight, AArrowDown);
 
-  if FTabArrowLeft then
+  if FTabArrowScroll then
   begin
     DoPaintArrowTo(C, triLeft, AArrowLeft,
       IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow), FColorBg);
@@ -634,14 +638,14 @@ begin
   //arrows?
   GetArrowRect(RLeft, RRight, RDown);
 
-  if FTabArrowLeft then
+  if FTabArrowScroll then
     if PtInRect(RLeft, Pnt) then
     begin
       Result:= cAtArrowLeft;
       Exit
     end;
 
-  if FTabArrowLeft then
+  if FTabArrowScroll then
     if PtInRect(RRight, Pnt) then
     begin
       Result:= cAtArrowRight;
@@ -860,9 +864,11 @@ begin
   RDown.Bottom:= RLeft.Bottom;
 
   RLeft.Left:= FTabIndentArrowLeft;
-  RLeft.Right:= RLeft.Left+FTabIndentArrowSize*2;
-  RRight.Left:= RLeft.Right+FTabIndentLeft;
-  RRight.Right:= RRight.Left+FTabIndentArrowSize*2;
+  RLeft.Right:= RLeft.Left+FTabIndentArrowSize*4;
+
+  RRight.Left:= RLeft.Right+1;
+  RRight.Right:= RRight.Left+FTabIndentArrowSize*4;
+
   RDown.Right:= ClientWidth;
   RDown.Left:= RDown.Right-FTabIndentArrowRight;
 end;

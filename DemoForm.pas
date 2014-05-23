@@ -68,7 +68,7 @@ begin
   t0.TabButtonclose:= false;
   t0.TabButtonplus:= false;
   t0.TabIndentInit:= 4;
-  t0.TabArrowLeft:= false;
+  t0.TabArrowScroll:= false;
   t0.TabArrowDown:= false;
 
   t0.DoAddTab('Tab');
