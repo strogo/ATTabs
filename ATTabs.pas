@@ -23,7 +23,17 @@ type
 
 type
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
-    var ACanClose: boolean) of object;  
+    var ACanClose: boolean) of object;
+
+type
+  TATTriType = (triDown, triLeft, triRight);
+
+//int constants for GetTabAt  
+const
+  cAtTabPlus = -2;
+  cAtArrowLeft = -3;
+  cAtArrowRight = -4;
+  cAtArrowDown = -5;
 
 type
   TATTabs = class(TPanel)
@@ -37,9 +47,11 @@ type
     FColorCloseBg: TColor;
     FColorCloseBgOver: TColor;
     FColorCloseX: TColor;
-    FTabAngle: Integer;
-    FTabWidthMin: Integer;
-    FTabWidthMax: Integer;
+    FColorArrow: TColor;
+    FColorArrowOver: TColor;
+    FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
+    FTabWidthMin: Integer; //limit of tab width (0: no limit)
+    FTabWidthMax: Integer; //limit of tab width
     FTabIndentInter: Integer; //space between nearest tabs (no need to angled tabs)
     FTabIndentInit: Integer; //space between first tab and control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
@@ -50,9 +62,14 @@ type
     FTabIndentXInner: Integer; //space from "x" square edge to "x" mark
     FTabIndentXSize: Integer; //half-size of "x" mark
     FTabIndentColor: Integer; //height of "misc color" line
-    FTabButtonClose: boolean;
-    FTabButtonPlus: boolean;
-    FTabButtonPlusText: string;
+    FTabIndentArrowSize: Integer; //half-size of "arrow" mark
+    FTabIndentArrowLeft: Integer; //space from left/right-arrows to left edge
+    FTabIndentArrowRight: Integer; //width of down-arrow rect
+    FTabButtonClose: boolean; //show "x" buttons
+    FTabButtonPlus: boolean; //show "plus" tab
+    FTabButtonPlusText: string; //text of "plus" tab
+    FTabArrowLeft: boolean; //show left/right arrows (scroll)
+    FTabArrowDown: boolean; //show down arrow (menu of tabs)
 
     FTabIndex: Integer;
     FTabIndexOver: Integer;
@@ -68,6 +85,7 @@ type
       const ACaption: string;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
       ACloseBtn: boolean);
+    procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect; AColor: TColor);
     procedure SetTabIndex(AIndex: Integer);
     function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
     function IsIndexOk(AIndex: Integer): boolean;
@@ -79,6 +97,7 @@ type
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
     function GetTabRect_X(const ARect: TRect): TRect;
+    procedure GetArrowRect(var RLeft, RRight, RDown: TRect);
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
@@ -126,6 +145,9 @@ type
     property TabButtonClose: boolean read FTabButtonClose write FTabButtonClose;
     property TabButtonPlus: boolean read FTabButtonPlus write FTabButtonPlus;
     property TabButtonPlusText: string read FTabButtonPlusText write FTabButtonPlusText;
+    property TabArrowLeft: boolean read FTabArrowLeft write FTabArrowLeft;
+    property TabArrowDown: boolean read FTabArrowDown write FTabArrowDown;
+
     //events
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
     property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
@@ -137,97 +159,6 @@ implementation
 uses
   SysUtils, Forms, Math;
 
-{ TATTabs }
-
-function TATTabs.IsIndexOk(AIndex: Integer): boolean;
-begin
-  Result:= (AIndex>=0) and (AIndex<FTabList.Count);
-end;
-
-constructor TATTabs.Create(AOnwer: TComponent);
-begin
-  inherited;
-
-  Caption:= '';
-  BorderStyle:= bsNone;
-  ControlStyle:= ControlStyle+[csOpaque];
-
-  Width:= 400;
-  Height:= 36;
-
-  FColorBg:= clBlack;
-  FColorTabActive:= $808080;
-  FColorTabPassive:= $786868;
-  FColorTabOver:= $A08080;
-  FColorBorderActive:= $A0A0A0;
-  FColorBorderPassive:= $A07070;
-  FColorCloseBg:= clNone;
-  FColorCloseBgOver:= $6060F0;
-  FColorCloseX:= clLtGray;
-
-  FTabAngle:= 5;
-  FTabWidthMin:= 70;
-  FTabWidthMax:= 200;
-  FTabIndentLeft:= 8;
-  FTabIndentInter:= 0;
-  FTabIndentInit:= 4;
-  FTabIndentTop:= 4;
-  FTabIndentBottom:= 6;
-  FTabIndentText:= 3;
-  FTabIndentXRight:= 5;
-  FTabIndentXInner:= 3;
-  FTabIndentXSize:= 6;
-
-  FTabIndentColor:= 3;
-  FTabButtonClose:= true;
-  FTabButtonPlus:= true;
-  FTabButtonPlusText:= '+';
-
-  FBitmap:= TBitmap.Create;
-  FBitmap.PixelFormat:= pf24bit;
-  FBitmap.Width:= 1600;
-  FBitmap.Height:= 60;
-
-  FBitmapText:= TBitmap.Create;
-  FBitmapText.PixelFormat:= pf24bit;
-  FBitmapText.Width:= 600;
-  FBitmapText.Height:= 60;
-
-  Font.Name:= 'Tahoma';
-  Font.Color:= $E0E0E0;
-  Font.Size:= 8;
-
-  FTabIndex:= 0;
-  FTabIndexOver:= -1;
-  FTabList:= TList.Create;
-
-  FOnTabClick:= nil;
-end;
-
-destructor TATTabs.Destroy;
-var
-  i: Integer;
-begin
-  for i:= FTabList.Count-1 downto 0 do
-  begin
-    TObject(FTabList[i]).Free;
-    FTabList[i]:= nil;
-  end;
-  FreeAndNil(FTabList);
-
-  FreeAndNil(FBitmapText);
-  FreeAndNil(FBitmap);
-  inherited;
-end;
-
-procedure TATTabs.Paint;
-begin
-  if Assigned(FBitmap) then
-  begin
-    DoPaintTo(FBitmap.Canvas);
-    Canvas.CopyRect(ClientRect, FBitmap.Canvas, ClientRect);
-  end;
-end;
 
 procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: real; const LineColor: TColor);
 // http://stackoverflow.com/a/3613953/1789574
@@ -318,6 +249,138 @@ begin
     intery := intery + gradient;
   end;
 
+end;
+
+
+procedure DrawTrinagle(C: TCanvas; Typ: TATTriType; const R: TRect; Color: TColor);
+var
+  P1, P2, P3: TPoint;
+begin
+  //P1/P2: points of vert/horz line
+  //P3: end point at arrow direction
+  case Typ of
+    triDown:
+    begin
+      P1:= Point(R.Left, R.Top);
+      P2:= Point(R.Right, R.Top);
+      P3:= Point((R.Left+R.Right) div 2, R.Bottom);
+    end;
+    triRight:
+    begin
+      P1:= Point(R.Left, R.Top);
+      P2:= Point(R.Left, R.Bottom);
+      P3:= Point(R.Right, (R.Top+R.Bottom) div 2);
+    end;
+    triLeft:
+    begin
+      P1:= Point(R.Right, R.Top);
+      P2:= Point(R.Right, R.Bottom);
+      P3:= Point(R.Left, (R.Top+R.Bottom) div 2);
+    end;
+  end;
+
+  C.Brush.Color:= Color;
+  C.Pen.Color:= Color;
+  C.Polygon([P1, P2, P3]);
+end;
+
+{ TATTabs }
+
+function TATTabs.IsIndexOk(AIndex: Integer): boolean;
+begin
+  Result:= (AIndex>=0) and (AIndex<FTabList.Count);
+end;
+
+constructor TATTabs.Create(AOnwer: TComponent);
+begin
+  inherited;
+
+  Caption:= '';
+  BorderStyle:= bsNone;
+  ControlStyle:= ControlStyle+[csOpaque];
+
+  Width:= 400;
+  Height:= 36;
+
+  FColorBg:= clBlack;
+  FColorTabActive:= $808080;
+  FColorTabPassive:= $786868;
+  FColorTabOver:= $A08080;
+  FColorBorderActive:= $A0A0A0;
+  FColorBorderPassive:= $A07070;
+  FColorCloseBg:= clNone;
+  FColorCloseBgOver:= $6060F0;
+  FColorCloseX:= clLtGray;
+  FColorArrow:= $999999;
+  FColorArrowOver:= $E0E0E0;
+
+  FTabAngle:= 5;
+  FTabWidthMin:= 70;
+  FTabWidthMax:= 200;
+  FTabIndentLeft:= 8;
+  FTabIndentInter:= 0;
+  FTabIndentInit:= 45;
+  FTabIndentTop:= 4;
+  FTabIndentBottom:= 6;
+  FTabIndentText:= 3;
+  FTabIndentXRight:= 5;
+  FTabIndentXInner:= 3;
+  FTabIndentXSize:= 6;
+  FTabIndentArrowSize:= 5;
+  FTabIndentArrowLeft:= 10;
+  FTabIndentArrowRight:= 26;
+
+  FTabIndentColor:= 3;
+  FTabButtonClose:= true;
+  FTabButtonPlus:= true;
+  FTabButtonPlusText:= '+';
+  FTabArrowLeft:= true;
+  FTabArrowDown:= true;
+
+  FBitmap:= TBitmap.Create;
+  FBitmap.PixelFormat:= pf24bit;
+  FBitmap.Width:= 1600;
+  FBitmap.Height:= 60;
+
+  FBitmapText:= TBitmap.Create;
+  FBitmapText.PixelFormat:= pf24bit;
+  FBitmapText.Width:= 600;
+  FBitmapText.Height:= 60;
+
+  Font.Name:= 'Tahoma';
+  Font.Color:= $E0E0E0;
+  Font.Size:= 8;
+
+  FTabIndex:= 0;
+  FTabIndexOver:= -1;
+  FTabList:= TList.Create;
+
+  FOnTabClick:= nil;
+end;
+
+destructor TATTabs.Destroy;
+var
+  i: Integer;
+begin
+  for i:= FTabList.Count-1 downto 0 do
+  begin
+    TObject(FTabList[i]).Free;
+    FTabList[i]:= nil;
+  end;
+  FreeAndNil(FTabList);
+
+  FreeAndNil(FBitmapText);
+  FreeAndNil(FBitmap);
+  inherited;
+end;
+
+procedure TATTabs.Paint;
+begin
+  if Assigned(FBitmap) then
+  begin
+    DoPaintTo(FBitmap.Canvas);
+    Canvas.CopyRect(ClientRect, FBitmap.Canvas, ClientRect);
+  end;
 end;
 
 procedure TATTabs.DoPaintTabTo(C: TCanvas; ARect: TRect;
@@ -478,6 +541,7 @@ var
   RBottom: TRect;
   AColorClose: TColor;
   ARect: TRect;
+  AArrowLeft, AArrowRight, AArrowDown: TRect;
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ClientRect);
@@ -512,7 +576,7 @@ begin
     AColorClose:= clNone;
     DoPaintTabTo(C, ARect,
       FTabButtonPlusText,
-      IfThen(FTabIndexOver=-2, FColorTabOver, FColorTabPassive),
+      IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
       FColorBorderPassive,
       FColorBorderActive,
       clNone,
@@ -537,16 +601,62 @@ begin
       FTabButtonClose,
       );
   end;
+
+  //paint arrows
+  GetArrowRect(AArrowLeft, AArrowRight, AArrowDown);
+
+  if FTabArrowLeft then
+  begin
+    DoPaintArrowTo(C, triLeft, AArrowLeft,
+      IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow));
+    DoPaintArrowTo(C, triRight, AArrowRight,
+      IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow));
+  end;
+    
+  if FTabArrowDown then
+  begin
+    C.Brush.Color:= FColorBg;
+    C.FillRect(AArrowDown);
+    DoPaintArrowTo(C, triDown, AArrowDown,
+      IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow));
+  end;
 end;
+
 
 function TATTabs.GetTabAt(X, Y: Integer): Integer;
 var
   i: Integer;
   Pnt: TPoint;
+  RLeft, RRight, RDown: TRect;
 begin
   Result:= -1;
   Pnt:= Point(X, Y);
 
+  //arrows?
+  GetArrowRect(RLeft, RRight, RDown);
+
+  if FTabArrowLeft then
+    if PtInRect(RLeft, Pnt) then
+    begin
+      Result:= cAtArrowLeft;
+      Exit
+    end;
+
+  if FTabArrowLeft then
+    if PtInRect(RRight, Pnt) then
+    begin
+      Result:= cAtArrowRight;
+      Exit
+    end;
+
+  if FTabArrowDown then
+    if PtInRect(RDown, Pnt) then
+    begin
+      Result:= cAtArrowDown;
+      Exit
+    end;
+
+  //normal tab?
   for i:= 0 to FTabList.Count-1 do
     if PtInRect(GetTabRect(i), Pnt) then
     begin
@@ -554,9 +664,13 @@ begin
       Exit;
     end;
 
+  //plus tab?
   if FTabButtonPlus then
     if PtInRect(GetTabRect_Plus, Pnt) then
-      Result:= -2;
+    begin
+      Result:= cAtTabPlus;
+      Exit
+    end;  
 end;
 
 procedure TATTabs.MouseDown(Button: TMouseButton; Shift: TShiftState;
@@ -566,7 +680,7 @@ var
 begin
   FTabIndexOver:= GetTabAt(X, Y);
 
-  if FTabIndexOver=-2 then
+  if FTabIndexOver=cAtTabPlus then
   begin
     if Assigned(FOnTabPlusClick) then
       FOnTabPlusClick(Self);
@@ -703,5 +817,51 @@ begin
   end;
 end;
 
+
+procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect; AColor: TColor);
+const
+  cRatio = 0.866; //sqrt(3)/2
+var
+  P: TPoint;
+  R: TRect;
+  N, SizeX, SizeY: Integer;
+begin
+  N:= FTabIndentArrowSize;
+  case ATyp of
+    triLeft,
+    triRight:
+      begin
+        SizeY:= N;
+        SizeX:= Trunc(N*cRatio);
+      end;
+    else
+      begin
+        SizeX:= N;
+        SizeY:= Trunc(N*cRatio);
+      end;
+  end;
+
+  P:= CenterPoint(ARect);
+  R:= Rect(P.X-SizeX, P.Y-SizeY, P.X+SizeX, P.Y+SizeY);
+  DrawTrinagle(C, ATyp, R, AColor);
+end;
+
+
+procedure TATTabs.GetArrowRect(var RLeft, RRight, RDown: TRect);
+begin
+  RLeft.Top:= FTabIndentTop;
+  RLeft.Bottom:= ClientHeight-FTabIndentBottom;
+  RRight.Top:= RLeft.Top;
+  RRight.Bottom:= RLeft.Bottom;
+  RDown.Top:= RLeft.Top;
+  RDown.Bottom:= RLeft.Bottom;
+
+  RLeft.Left:= FTabIndentArrowLeft;
+  RLeft.Right:= RLeft.Left+FTabIndentArrowSize*2;
+  RRight.Left:= RLeft.Right+FTabIndentLeft;
+  RRight.Right:= RRight.Left+FTabIndentArrowSize*2;
+  RDown.Right:= ClientWidth;
+  RDown.Left:= RDown.Right-FTabIndentArrowRight;
+end;
 
 end.

@@ -46,13 +46,14 @@ begin
   t.Parent:= Self;
   t.Align:= alTop;
   t.Height:= 33;
-  t.OnTabClick:= TabClick;
-  t.OnTabPlusClick:= TabPlusClick;
-  t.OnTabClose:= TabClose;
+
+  t.OnTabClick:=     {$ifdef FPC}@{$endif} TabClick;
+  t.OnTabPlusClick:= {$ifdef FPC}@{$endif} TabPlusClick;
+  t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
+
   t.TabAngle:= 4;
   t.TabIndentText:= 0;
-  t.TabIndentInit:= 20;
-  //t.TabIndentXRight:= 30;
+  t.TabIndentInit:= 45;
 
   t.DoAddTab('Tab');
   t.DoAddTab('I');
@@ -66,6 +67,10 @@ begin
   t0.Align:= alBottom;
   t0.TabButtonclose:= false;
   t0.TabButtonplus:= false;
+  t0.TabIndentInit:= 4;
+  t0.TabArrowLeft:= false;
+  t0.TabArrowDown:= false;
+
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
 
