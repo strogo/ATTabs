@@ -9,7 +9,7 @@ uses
   LCLIntf,
   {$endif}
   Classes, Types, Graphics,
-  Controls, ExtCtrls;
+  Controls, ExtCtrls, Menus;
 
 type
   TATTabData = class
@@ -74,12 +74,14 @@ type
     FTabIndex: Integer;
     FTabIndexOver: Integer;
     FTabList: TList;
-    
+    FTabMenu: TPopupMenu;
+
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
     FOnTabClick: TNotifyEvent;
     FOnTabPlusClick: TNotifyEvent;
     FOnTabClose: TATTabCloseEvent;
+
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
@@ -90,6 +92,7 @@ type
     procedure SetTabIndex(AIndex: Integer);
     function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
     function IsIndexOk(AIndex: Integer): boolean;
+    procedure TabMenuClick(Sender: TObject);
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
@@ -102,13 +105,14 @@ type
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
+    property TabIndex: Integer read FTabIndex write SetTabIndex;
     procedure DoAddTab(const ACaption: string;
       AObject: TObject = nil;
       AModified: boolean = false;
       AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
     procedure DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
-    property TabIndex: Integer read FTabIndex write SetTabIndex;
+    procedure DoTabMenu;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -296,6 +300,11 @@ begin
   Result:= (AIndex>=0) and (AIndex<FTabList.Count);
 end;
 
+function TATTabs.TabCount: Integer;
+begin
+  Result:= FTabList.Count;
+end;
+
 constructor TATTabs.Create(AOnwer: TComponent);
 begin
   inherited;
@@ -359,15 +368,18 @@ begin
   FTabIndex:= 0;
   FTabIndexOver:= -1;
   FTabList:= TList.Create;
+  FTabMenu:= nil;
 
   FOnTabClick:= nil;
+  FOnTabPlusClick:= nil;
+  FOnTabClose:= nil;
 end;
 
 destructor TATTabs.Destroy;
 var
   i: Integer;
 begin
-  for i:= FTabList.Count-1 downto 0 do
+  for i:= TabCount-1 downto 0 do
   begin
     TObject(FTabList[i]).Free;
     FTabList[i]:= nil;
@@ -510,7 +522,7 @@ begin
   Result.Bottom:= ClientHeight-FTabIndentBottom;
 
   if IsIndexOk(AIndex) then
-    for i:= 0 to FTabList.Count-1 do
+    for i:= 0 to TabCount-1 do
     begin
       Result.Left:= Result.Right + FTabIndentInter;
       Result.Right:= Result.Left + TATTabData(FTabList[i]).TabWidth;
@@ -558,7 +570,7 @@ begin
   DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
 
   //paint passive tabs
-  for i:= 0 to FTabList.Count-1 do
+  for i:= 0 to TabCount-1 do
     if i<>FTabIndex then
     begin
       ARect:= GetTabRect(i);
@@ -570,11 +582,11 @@ begin
         FColorBorderActive,
         TATTabData(FTabList[i]).TabColor,
         AColorClose,
-        FTabButtonClose,
+        FTabButtonClose
         );
     end;
 
-  //paint "+" tab
+  //paint "plus" tab
   if FTabButtonPlus then
   begin
     ARect:= GetTabRect_Plus;
@@ -586,7 +598,7 @@ begin
       FColorBorderActive,
       clNone,
       AColorClose,
-      false,
+      false
       );
   end;
 
@@ -603,7 +615,7 @@ begin
       FColorTabActive,
       TATTabData(FTabList[i]).TabColor,
       AColorClose,
-      FTabButtonClose,
+      FTabButtonClose
       );
   end;
 
@@ -660,7 +672,7 @@ begin
     end;
 
   //normal tab?
-  for i:= 0 to FTabList.Count-1 do
+  for i:= 0 to TabCount-1 do
     if PtInRect(GetTabRect(i), Pnt) then
     begin
       Result:= i;
@@ -687,10 +699,15 @@ begin
   begin
     case FTabIndexOver of
       cAtArrowLeft,
-      cAtArrowRight,
-      cAtArrowDown:
+      cAtArrowRight:
         begin
           Beep;
+          Exit
+        end;
+
+      cAtArrowDown:
+        begin
+          DoTabMenu;
           Exit
         end;
 
@@ -774,7 +791,7 @@ begin
     if FTabIndex>AIndex then
       SetTabIndex(FTabIndex-1)
     else
-    if (FTabIndex=AIndex) and (FTabIndex>0) and (FTabIndex>=FTabList.Count) then
+    if (FTabIndex=AIndex) and (FTabIndex>0) and (FTabIndex>=TabCount) then
       SetTabIndex(FTabIndex-1)
     else
     if FTabIndex=AIndex then
@@ -782,11 +799,6 @@ begin
 
     Invalidate;
   end;
-end;
-
-function TATTabs.TabCount: Integer;
-begin
-  Result:= FTabList.Count;
 end;
 
 procedure TATTabs.SetTabIndex(AIndex: Integer);
@@ -882,6 +894,42 @@ begin
 
   RDown.Right:= ClientWidth;
   RDown.Left:= RDown.Right-FTabIndentArrowRight;
+end;
+
+procedure TATTabs.DoTabMenu;
+var
+  i: Integer;
+  mi: TMenuItem;
+  R1, R2, RDown: TRect;
+  P: TPoint;
+begin
+  if TabCount=0 then Exit;
+
+  if not Assigned(FTabMenu) then
+    FTabMenu:= TPopupMenu.Create(Self);
+  FTabMenu.Items.Clear;
+
+  for i:= 0 to TabCount-1 do
+  begin
+    mi:= TMenuItem.Create(Self);
+    mi.Tag:= i;
+    mi.Caption:= TATTabData(FTabList[i]).TabCaption;
+    mi.OnClick:= {$ifdef FPC}@{$endif}TabMenuClick;
+    FTabMenu.Items.Add(mi);
+  end;
+
+  GetArrowRect(R1, R2, RDown);
+  P:= Point(RDown.Left, RDown.Bottom);
+  P:= ClientToScreen(P);
+  FTabMenu.Popup(P.X, P.Y);
+end;
+
+procedure TATTabs.TabMenuClick(Sender: TObject);
+var
+  NIndex: Integer;
+begin
+  NIndex:= (Sender as TComponent).Tag;
+  SetTabIndex(NIndex);
 end;
 
 end.
