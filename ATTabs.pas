@@ -24,6 +24,8 @@ type
 type
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
     var ACanClose: boolean) of object;
+  TATTabMenuEvent = procedure (Sender: TObject;
+    var ACanShow: boolean) of object;
 
 type
   TATTriType = (triDown, triLeft, triRight);
@@ -81,6 +83,7 @@ type
     FOnTabClick: TNotifyEvent;
     FOnTabPlusClick: TNotifyEvent;
     FOnTabClose: TATTabCloseEvent;
+    FOnTabMenu: TATTabMenuEvent;
 
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
@@ -161,6 +164,7 @@ type
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
     property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
     property OnTabClose: TATTabCloseEvent read FOnTabClose write FOnTabClose;
+    property OnTabMenu: TATTabMenuEvent read FOnTabMenu write FOnTabMenu;
   end;
 
 implementation
@@ -373,6 +377,7 @@ begin
   FOnTabClick:= nil;
   FOnTabPlusClick:= nil;
   FOnTabClose:= nil;
+  FOnTabMenu:= nil;
 end;
 
 destructor TATTabs.Destroy;
@@ -902,8 +907,14 @@ var
   mi: TMenuItem;
   R1, R2, RDown: TRect;
   P: TPoint;
+  bShow: boolean;
 begin
   if TabCount=0 then Exit;
+
+  bShow:= true;
+  if Assigned(FOnTabMenu) then
+    FOnTabMenu(Self, bShow);
+  if not bShow then Exit;
 
   if not Assigned(FTabMenu) then
     FTabMenu:= TPopupMenu.Create(Self);
