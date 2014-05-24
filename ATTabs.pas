@@ -48,6 +48,7 @@ type
     FColorTabOver: TColor;
     FColorCloseBg: TColor;
     FColorCloseBgOver: TColor;
+    FColorCloseBorderOver: TColor;
     FColorCloseX: TColor;
     FColorArrow: TColor;
     FColorArrowOver: TColor;
@@ -89,12 +90,13 @@ type
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
-      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
+      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
       ACloseBtn: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
       AColorArr, AColorBg: TColor);
     procedure SetTabIndex(AIndex: Integer);
-    function GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
+    procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect;
+      var AColorBg, AColorBorder: TColor);
     function IsIndexOk(AIndex: Integer): boolean;
     procedure TabMenuClick(Sender: TObject);
   public
@@ -136,6 +138,7 @@ type
     property ColorTabOver: TColor read FColorTabOver write FColorTabOver;
     property ColorCloseBg: TColor read FColorCloseBg write FColorCloseBg;
     property ColorCloseBgOver: TColor read FColorCloseBgOver write FColorCloseBgOver;
+    property ColorCloseBorderOver: TColor read FColorCloseBorderOver write FColorCloseBorderOver;
     property ColorCloseX: TColor read FColorCloseX write FColorCloseX;
     property ColorArrow: TColor read FColorArrow write FColorArrow;
     property ColorArrowOver: TColor read FColorArrowOver write FColorArrowOver;
@@ -346,6 +349,7 @@ begin
   FColorBorderPassive:= $A07070;
   FColorCloseBg:= clNone;
   FColorCloseBgOver:= $6060E0;
+  FColorCloseBorderOver:= FColorCloseBgOver;
   FColorCloseX:= clLtGray;
   FColorArrow:= $999999;
   FColorArrowOver:= $E0E0E0;
@@ -426,7 +430,7 @@ end;
 
 procedure TATTabs.DoPaintTabTo(C: TCanvas; ARect: TRect;
   const ACaption: string;
-  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg: TColor;
+  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
   ACloseBtn: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
@@ -491,6 +495,8 @@ begin
     RText:= GetTabRect_X(ARect);
     C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
     C.FillRect(RText);
+    C.Pen.Color:= IfThen(ATabCloseBorder<>clNone, ATabCloseBorder, ATabBg);
+    C.Rectangle(RText);
 
     C.Pen.Color:= FColorCloseX;
     C.Pen.Width:= 2;
@@ -563,18 +569,23 @@ begin
     P.Y+FTabIndentXSize);
 end;
 
-function TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
+procedure TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect;
+  var AColorBg, AColorBorder: TColor);
 var
   P: TPoint;
 begin
-  Result:= FColorCloseBg;
+  AColorBg:= FColorCloseBg;
+  AColorBorder:= FColorCloseBg;
   if FTabShowClose then
     if AIndex=FTabIndexOver then
     begin
       P:= Mouse.CursorPos;
       P:= ScreenToClient(P);
       if PtInRect(GetTabRect_X(ARect), P) then
-        Result:= FColorCloseBgOver;
+      begin
+        AColorBg:= FColorCloseBgOver;
+        AColorBorder:= FColorCloseBorderOver;
+      end;
     end;
 end;
 
@@ -582,7 +593,7 @@ procedure TATTabs.DoPaintTo(C: TCanvas);
 var
   i: Integer;
   RBottom: TRect;
-  AColorClose: TColor;
+  AColorXBg, AColorXBorder: TColor;
   ARect: TRect;
   AArrowLeft, AArrowRight, AArrowDown: TRect;
 begin
@@ -600,14 +611,15 @@ begin
     if i<>FTabIndex then
     begin
       ARect:= GetTabRect(i);
-      AColorClose:= GetTabCloseColor(i, ARect);
+      GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
       DoPaintTabTo(C, ARect,
         TATTabData(FTabList[i]).TabCaption,
         IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
         FColorBorderPassive,
         FColorBorderActive,
         TATTabData(FTabList[i]).TabColor,
-        AColorClose,
+        AColorXBg,
+        AColorXBorder,
         FTabShowClose
         );
     end;
@@ -616,14 +628,16 @@ begin
   if FTabShowPlus then
   begin
     ARect:= GetTabRect_Plus;
-    AColorClose:= clNone;
+    AColorXBg:= clNone;
+    AColorXBorder:= clNone;
     DoPaintTabTo(C, ARect,
       FTabShowPlusText,
       IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
       FColorBorderPassive,
       FColorBorderActive,
       clNone,
-      AColorClose,
+      AColorXBg,
+      AColorXBorder,
       false
       );
   end;
@@ -633,14 +647,15 @@ begin
   if IsIndexOk(i) then
   begin
     ARect:= GetTabRect(i);
-    AColorClose:= GetTabCloseColor(i, ARect);
+    GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
     DoPaintTabTo(C, ARect,
       TATTabData(FTabList[i]).TabCaption,
       FColorTabActive,
       FColorBorderActive,
       IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
       TATTabData(FTabList[i]).TabColor,
-      AColorClose,
+      AColorXBg,
+      AColorXBorder,
       FTabShowClose
       );
   end;

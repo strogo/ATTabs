@@ -104,6 +104,7 @@ begin
   t0.ColorTabOver:= $F2E4D7;
   t0.ColorCloseBg:= clNone;
   t0.ColorCloseBgOver:= $D5C9BD;
+  t0.ColorCloseBorderOver:= $B0B0B0;
   t0.ColorCloseX:= $7B6E60;
   t0.ColorArrow:= $5C5751;
   t0.ColorArrowOver:= t0.ColorArrow;
