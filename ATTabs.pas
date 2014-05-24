@@ -165,9 +165,9 @@ type
     property TabIndentArrowLeft: Integer read FTabIndentArrowLeft write FTabIndentArrowLeft;
     property TabIndentArrowRight: Integer read FTabIndentArrowRight write FTabIndentArrowRight;
 
-    property TabButtonClose: boolean read FTabShowClose write FTabShowClose;
-    property TabButtonPlus: boolean read FTabShowPlus write FTabShowPlus;
-    property TabButtonPlusText: string read FTabShowPlusText write FTabShowPlusText;
+    property TabShowClose: boolean read FTabShowClose write FTabShowClose;
+    property TabShowPlus: boolean read FTabShowPlus write FTabShowPlus;
+    property TabShowPlusText: string read FTabShowPlusText write FTabShowPlusText;
     property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll;
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
@@ -344,7 +344,7 @@ begin
   ControlStyle:= ControlStyle+[csOpaque];
 
   Width:= 400;
-  Height:= 36;
+  Height:= 35;
 
   FColorBg:= clBlack;
   FColorTabActive:= $808080;

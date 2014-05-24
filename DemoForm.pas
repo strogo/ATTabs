@@ -46,17 +46,14 @@ begin
   t:= TATTabs.Create(Self);
   t.Parent:= Self;
   t.Align:= alTop;
-  t.Height:= 33;
-
   t.OnTabClick:=     {$ifdef FPC}@{$endif} TabClick;
   t.OnTabPlusClick:= {$ifdef FPC}@{$endif} TabPlusClick;
   t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
 
   t.DoAddTab('Tab');
-  t.DoAddTab('I');
   t.DoAddTab('Tab three', nil, false, clGreen);
   t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
-  t.DoAddTab('i');
+  t.DoAddTab('I');
 
   //-----------------------------------
   //angle tabs below
@@ -65,13 +62,14 @@ begin
   t0.Align:= alBottom;
   t0.Font.Size:= 12;
   t0.Height:= 56;
+  t0.ColorBg:= $F9EADB;
   t0.TabIndentTop:= 20;
   t0.TabIndentBottom:= 6;
   t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
-  t0.TabButtonclose:= true;//false;
-  t0.TabButtonplus:= false;
   t0.TabIndentInit:= 4;
+  t0.TabShowclose:= false;
+  t0.TabShowplus:= false;
   t0.TabShowScroll:= false;
   t0.TabShowMenu:= true;
 
