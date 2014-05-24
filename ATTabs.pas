@@ -67,11 +67,12 @@ type
     FTabIndentArrowSize: Integer; //half-size of "arrow" mark
     FTabIndentArrowLeft: Integer; //space from left/right-arrows to left edge
     FTabIndentArrowRight: Integer; //width of down-arrow rect
-    FTabButtonClose: boolean; //show "x" buttons
-    FTabButtonPlus: boolean; //show "plus" tab
-    FTabButtonPlusText: string; //text of "plus" tab
-    FTabArrowScroll: boolean; //show left/right arrows (scroll)
-    FTabArrowDown: boolean; //show down arrow (menu of tabs)
+    FTabShowClose: boolean; //show "x" buttons
+    FTabShowPlus: boolean; //show "plus" tab
+    FTabShowPlusText: string; //text of "plus" tab
+    FTabShowScroll: boolean; //show left/right arrows (scroll)
+    FTabShowMenu: boolean; //show down arrow (menu of tabs)
+    FTabShowBorderActiveLow: boolean; //show border line below active tab (Firefox)
 
     FTabIndex: Integer;
     FTabIndexOver: Integer;
@@ -156,11 +157,12 @@ type
     property TabIndentArrowLeft: Integer read FTabIndentArrowLeft write FTabIndentArrowLeft;
     property TabIndentArrowRight: Integer read FTabIndentArrowRight write FTabIndentArrowRight;
 
-    property TabButtonClose: boolean read FTabButtonClose write FTabButtonClose;
-    property TabButtonPlus: boolean read FTabButtonPlus write FTabButtonPlus;
-    property TabButtonPlusText: string read FTabButtonPlusText write FTabButtonPlusText;
-    property TabArrowScroll: boolean read FTabArrowScroll write FTabArrowScroll;
-    property TabArrowDown: boolean read FTabArrowDown write FTabArrowDown;
+    property TabButtonClose: boolean read FTabShowClose write FTabShowClose;
+    property TabButtonPlus: boolean read FTabShowPlus write FTabShowPlus;
+    property TabButtonPlusText: string read FTabShowPlusText write FTabShowPlusText;
+    property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll;
+    property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
+    property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
 
     //events
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
@@ -358,13 +360,14 @@ begin
   FTabIndentArrowSize:= 4;
   FTabIndentArrowLeft:= 6;
   FTabIndentArrowRight:= 26;
-
   FTabIndentColor:= 3;
-  FTabButtonClose:= true;
-  FTabButtonPlus:= true;
-  FTabButtonPlusText:= '+';
-  FTabArrowScroll:= true;
-  FTabArrowDown:= true;
+  
+  FTabShowClose:= true;
+  FTabShowPlus:= true;
+  FTabShowPlusText:= '+';
+  FTabShowScroll:= true;
+  FTabShowMenu:= true;
+  FTabShowBorderActiveLow:= false;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -550,7 +553,7 @@ function TATTabs.GetTabRect_Plus: TRect;
 begin
   Result:= GetTabRect(TabCount-1);
   Result.Left:= Result.Right + FTabIndentInter;
-  Result.Right:= Result.Left + GetTabWidth(FTabButtonPlusText, 0, 0, false);
+  Result.Right:= Result.Left + GetTabWidth(FTabShowPlusText, 0, 0, false);
 end;
 
 function TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
@@ -558,7 +561,7 @@ var
   P: TPoint;
 begin
   Result:= FColorCloseBg;
-  if FTabButtonClose then
+  if FTabShowClose then
     if AIndex=FTabIndexOver then
     begin
       P:= Mouse.CursorPos;
@@ -598,17 +601,17 @@ begin
         FColorBorderActive,
         TATTabData(FTabList[i]).TabColor,
         AColorClose,
-        FTabButtonClose
+        FTabShowClose
         );
     end;
 
   //paint "plus" tab
-  if FTabButtonPlus then
+  if FTabShowPlus then
   begin
     ARect:= GetTabRect_Plus;
     AColorClose:= clNone;
     DoPaintTabTo(C, ARect,
-      FTabButtonPlusText,
+      FTabShowPlusText,
       IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
       FColorBorderPassive,
       FColorBorderActive,
@@ -628,17 +631,17 @@ begin
       TATTabData(FTabList[i]).TabCaption,
       FColorTabActive,
       FColorBorderActive,
-      FColorTabActive,
+      IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
       TATTabData(FTabList[i]).TabColor,
       AColorClose,
-      FTabButtonClose
+      FTabShowClose
       );
   end;
 
   //paint arrows
   GetArrowRect(AArrowLeft, AArrowRight, AArrowDown);
 
-  if FTabArrowScroll then
+  if FTabShowScroll then
   begin
     DoPaintArrowTo(C, triLeft, AArrowLeft,
       IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow), FColorBg);
@@ -646,7 +649,7 @@ begin
       IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow), FColorBg);
   end;
 
-  if FTabArrowDown then
+  if FTabShowMenu then
   begin
     DoPaintArrowTo(C, triDown, AArrowDown,
       IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow), FColorBg);
@@ -666,21 +669,21 @@ begin
   //arrows?
   GetArrowRect(RLeft, RRight, RDown);
 
-  if FTabArrowScroll then
+  if FTabShowScroll then
     if PtInRect(RLeft, Pnt) then
     begin
       Result:= cAtArrowLeft;
       Exit
     end;
 
-  if FTabArrowScroll then
+  if FTabShowScroll then
     if PtInRect(RRight, Pnt) then
     begin
       Result:= cAtArrowRight;
       Exit
     end;
 
-  if FTabArrowDown then
+  if FTabShowMenu then
     if PtInRect(RDown, Pnt) then
     begin
       Result:= cAtArrowDown;
@@ -696,7 +699,7 @@ begin
     end;
 
   //plus tab?
-  if FTabButtonPlus then
+  if FTabShowPlus then
     if PtInRect(GetTabRect_Plus, Pnt) then
     begin
       Result:= cAtTabPlus;
@@ -736,7 +739,7 @@ begin
 
       else
         begin
-          if FTabButtonClose then
+          if FTabShowClose then
           begin
             R:= GetTabRect(FTabIndexOver);
             R:= GetTabRect_X(R);
@@ -783,7 +786,7 @@ begin
   Data.TabObject:= AObject;
   Data.TabModified:= AModified;
   Data.TabColor:= AColor;
-  Data.TabWidth:= GetTabWidth(ACaption, FTabWidthMin, FTabWidthMax, FTabButtonClose);
+  Data.TabWidth:= GetTabWidth(ACaption, FTabWidthMin, FTabWidthMax, FTabShowClose);
 
   FTabList.Add(Data);
   Invalidate;
@@ -854,7 +857,7 @@ begin
     if ANewWidth>0 then
       Data.TabWidth:= ANewWidth
     else
-      Data.TabWidth:= GetTabWidth(Data.TabCaption, FTabWidthMin, FTabWidthMax, FTabButtonClose);
+      Data.TabWidth:= GetTabWidth(Data.TabCaption, FTabWidthMin, FTabWidthMax, FTabShowClose);
     Invalidate;  
   end;
 end;

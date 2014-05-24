@@ -76,8 +76,8 @@ begin
   t0.TabButtonclose:= true;//false;
   t0.TabButtonplus:= false;
   t0.TabIndentInit:= 4;
-  t0.TabArrowScroll:= false;
-  t0.TabArrowDown:= false;
+  t0.TabShowScroll:= false;
+  t0.TabShowMenu:= false;
 
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
@@ -89,7 +89,8 @@ begin
   t0.Align:= alBottom;
 
   t0.Height:= t0.Height-1;
-  t0.TabArrowScroll:= false;
+  t0.TabShowScroll:= false;
+  t0.TabShowBorderActiveLow:= true;
   t0.TabIndentInit:= 2;
   t0.TabIndentTop:= 4;
   t0.Font.Color:= clBlack;
