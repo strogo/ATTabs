@@ -136,6 +136,8 @@ type
     property ColorCloseBg: TColor read FColorCloseBg write FColorCloseBg;
     property ColorCloseBgOver: TColor read FColorCloseBgOver write FColorCloseBgOver;
     property ColorCloseX: TColor read FColorCloseX write FColorCloseX;
+    property ColorArrow: TColor read FColorArrow write FColorArrow;
+    property ColorArrowOver: TColor read FColorArrowOver write FColorArrowOver;
     //spaces
     property TabAngle: Integer read FTabAngle write FTabAngle;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
@@ -173,7 +175,7 @@ uses
   SysUtils, Forms, Math;
 
 
-procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: real; const LineColor: TColor);
+procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: {real}Integer; const LineColor: TColor);
 // http://stackoverflow.com/a/3613953/1789574
 var
   swapped: boolean;
@@ -215,6 +217,14 @@ var
   x: integer;
 
 begin
+  //speed up drawing (AT)
+  if (AX1 = AX2) or (AY1 = AY2) then
+  begin
+    Canvas.Pen.Color := LineColor;
+    Canvas.MoveTo(AX1, AY1);
+    Canvas.LineTo(AX2, AY2);
+    Exit
+  end;
 
   x1 := AX1;
   x2 := AX2;
@@ -223,6 +233,7 @@ begin
 
   dx := x2 - x1;
   dy := y2 - y1;
+
   swapped := abs(dx) < abs(dy);
   if swapped then
   begin
@@ -327,7 +338,7 @@ begin
   FColorBorderActive:= $A0A0A0;
   FColorBorderPassive:= $A07070;
   FColorCloseBg:= clNone;
-  FColorCloseBgOver:= $6060F0;
+  FColorCloseBgOver:= $6060E0;
   FColorCloseX:= clLtGray;
   FColorArrow:= $999999;
   FColorArrowOver:= $E0E0E0;
@@ -338,12 +349,12 @@ begin
   FTabIndentLeft:= 8;
   FTabIndentInter:= 0;
   FTabIndentInit:= 45;
-  FTabIndentTop:= 4;
+  FTabIndentTop:= 5;
   FTabIndentBottom:= 6;
   FTabIndentText:= 3;
   FTabIndentXRight:= 5;
   FTabIndentXInner:= 3;
-  FTabIndentXSize:= 6;
+  FTabIndentXSize:= 7;
   FTabIndentArrowSize:= 4;
   FTabIndentArrowLeft:= 6;
   FTabIndentArrowRight:= 26;
@@ -450,10 +461,10 @@ begin
     Rect(0, 0, RText.Right-RText.Left, RText.Bottom-RText.Top));
 
   //borders
-  DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y, ATabBorder);
-  DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y, ATabBorder);
+  DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y+1, ATabBorder);
+  DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y+1, ATabBorder);
   DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
-  DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X, ARect.Bottom, ATabBorderLow);
+  DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
 
   //tweak for border corners
   C.Pixels[PL1.X, PL1.Y]:= FColorBg;
@@ -489,12 +500,12 @@ var
 begin
   P:= Point(
     ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
-    (ARect.Top+ARect.Bottom) div 2);
+    (FTabIndentTop+ARect.Top+ARect.Bottom) div 2);
   Result:= Rect(
     P.X-FTabIndentXSize,
     P.Y-FTabIndentXSize,
-    P.X+FTabIndentXSize,
-    P.Y+FTabIndentXSize);
+    P.X+FTabIndentXSize-1,
+    P.Y+FTabIndentXSize-1);
 end;
 
 function TATTabs.GetTabWidth(const ACaption: string;

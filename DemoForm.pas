@@ -42,6 +42,7 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+  //angle tabs upper
   t:= TATTabs.Create(Self);
   t.Parent:= Self;
   t.Align:= alTop;
@@ -61,27 +62,53 @@ begin
   t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
   t.DoAddTab('i');
 
-  //angle
+  //-----------------------------------
+  //angle tabs below
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
-  t0.TabButtonclose:= false;
+  t0.Font.Size:= 12;
+  t0.Height:= 44;
+  t0.TabIndentTop:= 5;
+  t0.TabIndentBottom:= 6;
+  t0.TabIndentXSize:= 8;
+  t0.TabIndentXInner:= 3;
+  t0.TabButtonclose:= true;//false;
   t0.TabButtonplus:= false;
   t0.TabIndentInit:= 4;
   t0.TabArrowScroll:= false;
   t0.TabArrowDown:= false;
 
   t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
 
-  //rectangle
+  //-----------------------------------
+  //Firefox rectangle tabs
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
+
+  t0.Height:= t0.Height-1;
+  t0.TabArrowScroll:= false;
+  t0.TabIndentInit:= 2;
+  t0.TabIndentTop:= 4;
+  t0.Font.Color:= clBlack;
+  t0.ColorBg:= $F9EADB;
+  t0.ColorBorderActive:= $ACA196;
+  t0.ColorBorderPassive:= $ACA196;
+  t0.ColorTabActive:= $FCF5ED;
+  t0.ColorTabPassive:= $E0D3C7;
+  t0.ColorTabOver:= $F2E4D7;
+  t0.ColorCloseBg:= clNone;
+  t0.ColorCloseBgOver:= $D5C9BD;
+  t0.ColorCloseX:= $7B6E60;
+  t0.ColorArrow:= $5C5751;
+  t0.ColorArrowOver:= t0.ColorArrow;
+
   t0.TabAngle:= 0;
   t0.TabIndentInter:= 2;
-  t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab _____________________________________________________', nil, false, clGreen);
+  t0.DoAddTab('Firefox');
+  t0.DoAddTab('A tab _____________________________________________________', nil, false, clGreen);
   t0.DoAddTab('Tab middle len', nil, false, clBlue);
 end;
 
