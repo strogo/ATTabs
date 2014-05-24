@@ -42,7 +42,7 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  //angle tabs upper
+  //default tabs
   t:= TATTabs.Create(Self);
   t.Parent:= Self;
   t.Align:= alTop;
@@ -51,10 +51,6 @@ begin
   t.OnTabClick:=     {$ifdef FPC}@{$endif} TabClick;
   t.OnTabPlusClick:= {$ifdef FPC}@{$endif} TabPlusClick;
   t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
-
-  t.TabAngle:= 4;
-  t.TabIndentInit:= 45;
-  t.TabIndentText:= 5;
 
   t.DoAddTab('Tab');
   t.DoAddTab('I');

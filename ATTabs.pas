@@ -2,10 +2,15 @@ unit ATTabs;
 
 interface
 
+{$ifndef FPC}
+{$define windows}
+{$endif}
+
 uses
-  {$ifndef FPC}
+  {$ifdef windows}
   Windows, Messages,
-  {$else}
+  {$endif}
+  {$ifdef FPC}
   LCLIntf,
   {$endif}
   Classes, Types, Graphics,
@@ -124,7 +129,7 @@ type
     procedure Resize; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
-    {$ifndef FPC}
+    {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
   published
@@ -359,7 +364,7 @@ begin
   FTabWidthMax:= 200;
   FTabIndentLeft:= 8;
   FTabIndentInter:= 0;
-  FTabIndentInit:= 45;
+  FTabIndentInit:= 43;
   FTabIndentTop:= 5;
   FTabIndentBottom:= 6;
   FTabIndentText:= 6;
@@ -367,7 +372,7 @@ begin
   FTabIndentXInner:= 3;
   FTabIndentXSize:= 12;
   FTabIndentArrowSize:= 4;
-  FTabIndentArrowLeft:= 6;
+  FTabIndentArrowLeft:= 4;
   FTabIndentArrowRight:= 26;
   FTabIndentColor:= 3;
   
@@ -862,7 +867,8 @@ begin
     Result:= nil;
 end;
 
-{$ifndef FPC}
+{$ifdef windows}
+//needed to remove flickering on resize and mouse-over
 procedure TATTabs.WMEraseBkgnd(var Message: TMessage);
 begin
   Message.Result:= 1;
