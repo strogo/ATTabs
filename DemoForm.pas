@@ -68,7 +68,7 @@ begin
   t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
   t0.TabIndentInit:= 4;
-  t0.TabShowclose:= false;
+  t0.TabShowclose:= true; //false;
   t0.TabShowplus:= false;
   t0.TabShowScroll:= false;
   t0.TabShowMenu:= true;

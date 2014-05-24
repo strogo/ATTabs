@@ -305,22 +305,29 @@ begin
       P1:= Point(R.Left, R.Top);
       P2:= Point(R.Right, R.Top);
       P3:= Point((R.Left+R.Right) div 2, R.Bottom);
+      //DrawTriangleRaw(C, P1, P2, P3, Color);
+      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X, P3.Y-1), Color);
     end;
     triRight:
     begin
       P1:= Point(R.Left, R.Top);
       P2:= Point(R.Left, R.Bottom);
       P3:= Point(R.Right, (R.Top+R.Bottom) div 2);
+      //DrawTriangleRaw(C, P1, P2, P3, Color);
+      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X-1, P3.Y), Color);
     end;
     triLeft:
     begin
       P1:= Point(R.Right, R.Top);
       P2:= Point(R.Right, R.Bottom);
       P3:= Point(R.Left, (R.Top+R.Bottom) div 2);
+      //DrawTriangleRaw(C, P1, P2, P3, Color);
+      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X+1, P3.Y), Color);
     end;
   end;
 
-  DrawTriangleRaw(C, P1, P2, P3, Color);
+  DrawAntialisedLine(C, P1.X, P1.Y, P3.X, P3.Y, Color);
+  DrawAntialisedLine(C, P2.X, P2.Y, P3.X, P3.Y, Color);
 end;
 
 { TATTabs }
