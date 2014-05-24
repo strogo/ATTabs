@@ -306,6 +306,7 @@ begin
       P2:= Point(R.Right, R.Top);
       P3:= Point((R.Left+R.Right) div 2, R.Bottom);
       //DrawTriangleRaw(C, P1, P2, P3, Color);
+      //paint little shifted line - w/out antialiasing
       DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X, P3.Y-1), Color);
     end;
     triRight:
@@ -326,6 +327,7 @@ begin
     end;
   end;
 
+  //paint line with correct coords- antialiased
   DrawAntialisedLine(C, P1.X, P1.Y, P3.X, P3.Y, Color);
   DrawAntialisedLine(C, P2.X, P2.Y, P3.X, P3.Y, Color);
 end;
@@ -464,12 +466,15 @@ begin
   //left triangle
   PL1:= Point(ARect.Left+FTabAngle, ARect.Top);
   PL2:= Point(ARect.Left-FTabAngle, ARect.Bottom-1);
-  DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
+  //draw little shifted line- w/out anitalias
+  //DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
+  DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL1.X, PL2.Y), ATabBg);
 
   //right triangle
   PR1:= Point(ARect.Right-FTabAngle-1, ARect.Top);
   PR2:= Point(ARect.Right+FTabAngle-1, ARect.Bottom-1);
-  DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
+  //DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
+  DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR1.X, PR2.Y), ATabBg);
 
   //caption
   FBitmapText.Canvas.Brush.Color:= ATabBg;
