@@ -461,7 +461,7 @@ begin
   FBitmapText.Canvas.Font.Assign(Self.Font);
   FBitmapText.Canvas.TextOut(
     FTabAngle,
-    FTabIndentText, //??
+    FTabIndentText,
     ACaption);
   C.CopyRect(
     RText,
