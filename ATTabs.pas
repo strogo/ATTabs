@@ -277,8 +277,15 @@ begin
 
 end;
 
+procedure DrawTriangleRaw(C: TCanvas; const P1, P2, P3: TPoint; Color: TColor);
+//optimize later, make antialiased draw
+begin
+  C.Brush.Color:= Color;
+  C.Pen.Color:= Color;
+  C.Polygon([P1, P2, P3]);
+end;
 
-procedure DrawTrinagle(C: TCanvas; Typ: TATTriType; const R: TRect; Color: TColor);
+procedure DrawTriangleType(C: TCanvas; Typ: TATTriType; const R: TRect; Color: TColor);
 var
   P1, P2, P3: TPoint;
 begin
@@ -305,9 +312,7 @@ begin
     end;
   end;
 
-  C.Brush.Color:= Color;
-  C.Pen.Color:= Color;
-  C.Polygon([P1, P2, P3]);
+  DrawTriangleRaw(C, P1, P2, P3, Color);
 end;
 
 { TATTabs }
@@ -443,12 +448,12 @@ begin
   //left triangle
   PL1:= Point(ARect.Left+FTabAngle, ARect.Top);
   PL2:= Point(ARect.Left-FTabAngle, ARect.Bottom-1);
-  C.Polygon([PL1, PL2, Point(PL1.X, PL2.Y)]);
+  DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
 
   //right triangle
   PR1:= Point(ARect.Right-FTabAngle-1, ARect.Top);
   PR2:= Point(ARect.Right+FTabAngle-1, ARect.Bottom-1);
-  C.Polygon([PR1, PR2, Point(PR1.X, PR2.Y)]);
+  DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
 
   //caption
   FBitmapText.Canvas.Brush.Color:= ATabBg;
@@ -894,7 +899,7 @@ begin
 
   P:= CenterPoint(ARect);
   R:= Rect(P.X-SizeX, P.Y-SizeY, P.X+SizeX, P.Y+SizeY);
-  DrawTrinagle(C, ATyp, R, AColorArr);
+  DrawTriangleType(C, ATyp, R, AColorArr);
 end;
 
 
