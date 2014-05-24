@@ -53,8 +53,8 @@ begin
   t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
 
   t.TabAngle:= 4;
-  t.TabIndentText:= 0;
   t.TabIndentInit:= 45;
+  t.TabIndentText:= 5;
 
   t.DoAddTab('Tab');
   t.DoAddTab('I');
@@ -68,16 +68,16 @@ begin
   t0.Parent:= Self;
   t0.Align:= alBottom;
   t0.Font.Size:= 12;
-  t0.Height:= 44;
-  t0.TabIndentTop:= 5;
+  t0.Height:= 56;
+  t0.TabIndentTop:= 20;
   t0.TabIndentBottom:= 6;
-  t0.TabIndentXSize:= 8;
+  t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
   t0.TabButtonclose:= true;//false;
   t0.TabButtonplus:= false;
   t0.TabIndentInit:= 4;
   t0.TabShowScroll:= false;
-  t0.TabShowMenu:= false;
+  t0.TabShowMenu:= true;
 
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
@@ -88,11 +88,13 @@ begin
   t0.Parent:= Self;
   t0.Align:= alBottom;
 
-  t0.Height:= t0.Height-1;
+  t0.Height:= 42;
   t0.TabShowScroll:= false;
   t0.TabShowBorderActiveLow:= true;
   t0.TabIndentInit:= 2;
+  t0.TabIndentBottom:= 14;
   t0.TabIndentTop:= 4;
+  t0.TabIndentXSize:= 13;
   t0.Font.Color:= clBlack;
   t0.ColorBg:= $F9EADB;
   t0.ColorBorderActive:= $ACA196;

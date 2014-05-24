@@ -62,7 +62,7 @@ type
     FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
     FTabIndentXRight: Integer; //space from "x" btn to right tab edge
     FTabIndentXInner: Integer; //space from "x" square edge to "x" mark
-    FTabIndentXSize: Integer; //half-size of "x" mark
+    FTabIndentXSize: Integer; //size of "x" mark
     FTabIndentColor: Integer; //height of "misc color" line
     FTabIndentArrowSize: Integer; //half-size of "arrow" mark
     FTabIndentArrowLeft: Integer; //space from left/right-arrows to left edge
@@ -353,10 +353,10 @@ begin
   FTabIndentInit:= 45;
   FTabIndentTop:= 5;
   FTabIndentBottom:= 6;
-  FTabIndentText:= 3;
+  FTabIndentText:= 6;
   FTabIndentXRight:= 5;
   FTabIndentXInner:= 3;
-  FTabIndentXSize:= 7;
+  FTabIndentXSize:= 12;
   FTabIndentArrowSize:= 4;
   FTabIndentArrowLeft:= 6;
   FTabIndentArrowRight:= 26;
@@ -435,7 +435,7 @@ begin
   C.Brush.Color:= ATabBg;
 
   NIndentL:= Max(FTabIndentLeft, FTabAngle);
-  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabIndentXSize);
+  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabIndentXSize div 2);
   RText:= Rect(ARect.Left+FTabAngle, ARect.Top, ARect.Right-FTabAngle, ARect.Bottom);
   C.FillRect(RText);
   RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
@@ -456,7 +456,7 @@ begin
   FBitmapText.Canvas.Font.Assign(Self.Font);
   FBitmapText.Canvas.TextOut(
     FTabAngle,
-    ARect.Top + FTabIndentText,
+    FTabIndentText, //??
     ACaption);
   C.CopyRect(
     RText,
@@ -495,20 +495,6 @@ begin
     C.LineTo(RText.Right-FTabIndentXInner-1, RText.Top+FTabIndentXInner);
     C.Pen.Width:= 1;
   end;
-end;
-
-function TATTabs.GetTabRect_X(const ARect: TRect): TRect;
-var
-  P: TPoint;
-begin
-  P:= Point(
-    ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
-    (FTabIndentTop+ARect.Top+ARect.Bottom) div 2);
-  Result:= Rect(
-    P.X-FTabIndentXSize,
-    P.Y-FTabIndentXSize,
-    P.X+FTabIndentXSize-1,
-    P.Y+FTabIndentXSize-1);
 end;
 
 function TATTabs.GetTabWidth(const ACaption: string;
@@ -554,6 +540,22 @@ begin
   Result:= GetTabRect(TabCount-1);
   Result.Left:= Result.Right + FTabIndentInter;
   Result.Right:= Result.Left + GetTabWidth(FTabShowPlusText, 0, 0, false);
+end;
+
+function TATTabs.GetTabRect_X(const ARect: TRect): TRect;
+var
+  P: TPoint;
+begin
+  P:= Point(
+    ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
+    (ARect.Top+ARect.Bottom) div 2 + 1);
+  Dec(P.X, FTabIndentXSize div 2);
+  Dec(P.Y, FTabIndentXSize div 2);
+  Result:= Rect(
+    P.X,
+    P.Y,
+    P.X+FTabIndentXSize,
+    P.Y+FTabIndentXSize);
 end;
 
 function TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect): TColor;
@@ -940,6 +942,8 @@ begin
     mi.Tag:= i;
     mi.Caption:= TATTabData(FTabList[i]).TabCaption;
     mi.OnClick:= {$ifdef FPC}@{$endif}TabMenuClick;
+    mi.RadioItem:= true;
+    mi.Checked:= i=FTabIndex;
     FTabMenu.Items.Add(mi);
   end;
 
