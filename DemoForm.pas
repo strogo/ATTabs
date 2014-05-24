@@ -14,6 +14,8 @@ type
     bLeft: TButton;
     bRt: TButton;
     Edit1: TEdit;
+    chkX: TCheckBox;
+    chkPlus: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
@@ -21,6 +23,9 @@ type
     procedure bLeftClick(Sender: TObject);
     procedure bRtClick(Sender: TObject);
     procedure Edit1Change(Sender: TObject);
+    procedure chkXClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure chkPlusClick(Sender: TObject);
   private
     { Private declarations }
     LockEdit: boolean;
@@ -51,7 +56,7 @@ begin
   t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
 
   t.DoAddTab('Tab');
-  t.DoAddTab('Tab three', nil, false, clGreen);
+  t.DoAddTab('Tab middle len', nil, false, clGreen);
   t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
   t.DoAddTab('I');
 
@@ -183,6 +188,30 @@ begin
 
   d.TabCaption:= Edit1.Text;
   t.DoUpdateTabWidth(t.tabIndex);
+end;
+
+procedure TForm1.chkXClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  t.TabShowClose:= chkX.Checked;
+  for i:= 0 to t.TabCount-1 do
+    t.DoUpdateTabWidth(i);
+end;
+
+procedure TForm1.FormShow(Sender: TObject);
+begin
+  chkX.Checked:= t.TabShowClose;
+  chkPlus.Checked:= t.TabShowPlus;
+end;
+
+procedure TForm1.chkPlusClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  t.TabShowPlus:= chkPlus.Checked;
+  for i:= 0 to t.TabCount-1 do
+    t.DoUpdateTabWidth(i);
 end;
 
 end.

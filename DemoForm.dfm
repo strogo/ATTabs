@@ -9,10 +9,11 @@ object Form1: TForm1
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object bAdd: TButton
@@ -67,5 +68,23 @@ object Form1: TForm1
     Height = 21
     TabOrder = 5
     OnChange = Edit1Change
+  end
+  object chkX: TCheckBox
+    Left = 200
+    Top = 152
+    Width = 97
+    Height = 17
+    Caption = '"x" buttons'
+    TabOrder = 6
+    OnClick = chkXClick
+  end
+  object chkPlus: TCheckBox
+    Left = 200
+    Top = 168
+    Width = 97
+    Height = 17
+    Caption = '"+" tab'
+    TabOrder = 7
+    OnClick = chkPlusClick
   end
 end

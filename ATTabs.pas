@@ -466,15 +466,22 @@ begin
   //left triangle
   PL1:= Point(ARect.Left+FTabAngle, ARect.Top);
   PL2:= Point(ARect.Left-FTabAngle, ARect.Bottom-1);
-  //draw little shifted line- w/out anitalias
-  //DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
-  DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL1.X, PL2.Y), ATabBg);
+  if FTabAngle>0 then
+  begin
+    //DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
+    //draw little shifted line- bottom-left point x+=1
+    DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL1.X, PL2.Y), ATabBg);
+  end;
 
   //right triangle
   PR1:= Point(ARect.Right-FTabAngle-1, ARect.Top);
   PR2:= Point(ARect.Right+FTabAngle-1, ARect.Bottom-1);
-  //DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
-  DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR1.X, PR2.Y), ATabBg);
+  if FTabAngle>0 then
+  begin
+    //DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
+    //draw little shifted line- bottom-right point x-=1
+    DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR1.X, PR2.Y), ATabBg);
+  end;  
 
   //caption
   FBitmapText.Canvas.Brush.Color:= ATabBg;
