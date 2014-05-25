@@ -1,7 +1,7 @@
 ATTabs
 ======
 
-Delphi/Lazarus component for light, original tabs.  
+Delphi/Lazarus component for lite tabs.  
 Currently deep alpha.
 
 Sample
