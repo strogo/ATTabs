@@ -62,8 +62,8 @@ type
     FTabWidthHideX: Integer; //tab minimal width, after which "x" mark hides for inactive tabs
     FTabWidthMin: Integer; //tab width max
     FTabWidthMax: Integer; //tab width min
-    FTabIndentInter: Integer; //space between nearest tabs (no need to angled tabs)
-    FTabIndentInit: Integer; //space between first tab and control edge
+    FTabIndentInter: Integer; //space between nearest tabs (no need for angled tabs)
+    FTabIndentInit: Integer; //space between first tab and left control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
     FTabIndentText: Integer; //space between text and tab top edge
     FTabIndentTop: Integer; //height of top empty space (colored with bg)
@@ -73,14 +73,14 @@ type
     FTabIndentXSize: Integer; //size of "x" mark
     FTabIndentColor: Integer; //height of "misc color" line
     FTabIndentArrowSize: Integer; //half-size of "arrow" mark
-    FTabIndentArrowLeft: Integer; //space from left/right-arrows to left edge
-    FTabIndentArrowRight: Integer; //width of down-arrow rect
+    FTabIndentArrowLeft: Integer; //space from scroll-arrows to left control edge
+    FTabIndentArrowRight: Integer; //width of down-arrow area at right
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: string; //text of "plus" tab
-    FTabShowScroll: boolean; //show left/right arrows (scroll)
+    FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
-    FTabShowBorderActiveLow: boolean; //show border line below active tab (Firefox)
+    FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
 
     FTabIndex: Integer;
     FTabIndexOver: Integer;
