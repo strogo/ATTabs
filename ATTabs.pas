@@ -33,8 +33,9 @@ type
 
 type
   TATTriType = (triDown, triLeft, triRight);
+  TATTabShowClose = (tbShowNone, tbShowAll, tbShowActive);
 
-//int constants for GetTabAt  
+//int constants for GetTabAt
 const
   cAtTabPlus = -2;
   cAtArrowLeft = -3;
@@ -58,6 +59,7 @@ type
     FColorArrowOver: TColor;
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
     FTabWidth: Integer; //tab width current (auto-sized)
+    FTabWidthHideX: Integer; //tab minimal width, after which "x" mark hides for inactive tabs
     FTabWidthMin: Integer; //tab width max
     FTabWidthMax: Integer; //tab width min
     FTabIndentInter: Integer; //space between nearest tabs (no need to angled tabs)
@@ -73,7 +75,7 @@ type
     FTabIndentArrowSize: Integer; //half-size of "arrow" mark
     FTabIndentArrowLeft: Integer; //space from left/right-arrows to left edge
     FTabIndentArrowRight: Integer; //width of down-arrow rect
-    FTabShowClose: boolean; //show "x" buttons
+    FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: string; //text of "plus" tab
     FTabShowScroll: boolean; //show left/right arrows (scroll)
@@ -103,6 +105,7 @@ type
     procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect;
       var AColorBg, AColorBorder: TColor);
     function IsIndexOk(AIndex: Integer): boolean;
+    function IsShowX(AIndex: Integer): boolean;
     procedure TabMenuClick(Sender: TObject);
   public
     constructor Create(AOnwer: TComponent); override;
@@ -165,7 +168,7 @@ type
     property TabIndentArrowLeft: Integer read FTabIndentArrowLeft write FTabIndentArrowLeft;
     property TabIndentArrowRight: Integer read FTabIndentArrowRight write FTabIndentArrowRight;
 
-    property TabShowClose: boolean read FTabShowClose write FTabShowClose;
+    property TabShowClose: TATTabShowClose read FTabShowClose write FTabShowClose;
     property TabShowPlus: boolean read FTabShowPlus write FTabShowPlus;
     property TabShowPlusText: string read FTabShowPlusText write FTabShowPlusText;
     //property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll; //disabled
@@ -371,6 +374,7 @@ begin
   FTabAngle:= 5;
   FTabWidthMin:= 26;
   FTabWidthMax:= 130;
+  FTabWidthHideX:= 55;
   FTabIndentLeft:= 8;
   FTabIndentInter:= 0;
   FTabIndentInit:= 4;
@@ -385,7 +389,7 @@ begin
   FTabIndentArrowRight:= 20;
   FTabIndentColor:= 3;
   
-  FTabShowClose:= true;
+  FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
   FTabShowPlusText:= '+';
   FTabShowScroll:= false; //not supported
@@ -603,7 +607,7 @@ var
 begin
   AColorBg:= FColorCloseBg;
   AColorBorder:= FColorCloseBg;
-  if FTabShowClose then
+  if IsShowX(AIndex) then
     if AIndex=FTabIndexOver then
     begin
       P:= Mouse.CursorPos;
@@ -667,7 +671,7 @@ begin
         TATTabData(FTabList[i]).TabColor,
         AColorXBg,
         AColorXBorder,
-        FTabShowClose
+        IsShowX(i)
         );
     end;
 
@@ -685,7 +689,7 @@ begin
       TATTabData(FTabList[i]).TabColor,
       AColorXBg,
       AColorXBorder,
-      FTabShowClose
+      IsShowX(i)
       );
   end;
 
@@ -790,7 +794,7 @@ begin
 
       else
         begin
-          if FTabShowClose then
+          if IsShowX(FTabIndexOver) then
           begin
             R:= GetTabRect(FTabIndexOver);
             R:= GetTabRect_X(R);
@@ -1032,6 +1036,18 @@ begin
     Value:= FTabWidthMax;
 
   FTabWidth:= Value;
+end;
+
+function TATTabs.IsShowX(AIndex: Integer): boolean;
+begin
+  case FTabShowClose of
+    tbShowNone: Result:= false;
+    tbShowAll: Result:= true;
+    tbShowActive: Result:= AIndex=FTabIndex;
+  end;
+
+  if (AIndex<>FTabIndex) and (FTabWidth<FTabWidthHideX) then
+    Result:= false;
 end;
 
 end.

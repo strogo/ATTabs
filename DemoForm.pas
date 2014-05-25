@@ -78,7 +78,7 @@ begin
   t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
   t0.TabIndentInit:= 4;
-  t0.TabShowclose:= true; //false;
+  t0.TabShowclose:= tbShowActive;
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
 
@@ -195,7 +195,10 @@ end;
 
 procedure TForm1.chkXClick(Sender: TObject);
 begin
-  t.TabShowClose:= chkX.Checked;
+  if chkX.Checked then
+    t.TabShowClose:= tbShowAll
+  else
+    t.TabShowClose:= tbShowNone;
   t.Invalidate;
 end;
 
@@ -207,7 +210,7 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  chkX.Checked:= t.TabShowClose;
+  chkX.Checked:= t.TabShowClose=tbShowAll;
   chkPlus.Checked:= t.TabShowPlus;
 end;
 
