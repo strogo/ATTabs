@@ -1011,15 +1011,18 @@ end;
 
 procedure TATTabs.DoUpdateTabWidths;
 var
-  Value: Integer;
+  Value, Count: Integer;
 begin
+  Count:= TabCount;
+  if Count=0 then Exit;
+
   //tricky formula: calculate auto-width
   Value:= (ClientWidth
     - IfThen(FTabShowPlus, GetTabWidth_Plus_Raw + 2*FTabIndentLeft + 1*FTabAngle)
     - FTabAngle*2
     - FTabIndentInter
     - FTabIndentInit
-    - IfThen(FTabShowMenu, FTabIndentArrowRight)) div TabCount
+    - IfThen(FTabShowMenu, FTabIndentArrowRight)) div Count
       - FTabIndentInter;
 
   if Value<FTabWidthMin then
