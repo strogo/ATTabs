@@ -190,16 +190,13 @@ begin
   if LockEdit then Exit;
 
   d.TabCaption:= Edit1.Text;
-  t.DoUpdateTabWidth(t.tabIndex);
+  t.Invalidate;
 end;
 
 procedure TForm1.chkXClick(Sender: TObject);
-var
-  i: Integer;
 begin
   t.TabShowClose:= chkX.Checked;
-  for i:= 0 to t.TabCount-1 do
-    t.DoUpdateTabWidth(i);
+  t.Invalidate;
 end;
 
 procedure TForm1.chkPlusClick(Sender: TObject);

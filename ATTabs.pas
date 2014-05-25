@@ -23,7 +23,6 @@ type
     TabObject: TObject;
     TabColor: TColor;
     TabModified: boolean;
-    TabWidth: Integer;
   end;
 
 type
@@ -58,8 +57,9 @@ type
     FColorArrow: TColor;
     FColorArrowOver: TColor;
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
-    FTabWidthMin: Integer; //limit of tab width (0: no limit)
-    FTabWidthMax: Integer; //limit of tab width
+    FTabWidth: Integer; //tab width current (auto-sized)
+    FTabWidthMin: Integer; //tab width max
+    FTabWidthMax: Integer; //tab width min
     FTabIndentInter: Integer; //space between nearest tabs (no need to angled tabs)
     FTabIndentInit: Integer; //space between first tab and control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
@@ -108,7 +108,7 @@ type
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
     function GetTabWidth_Plus_Raw: Integer;
-    function GetTabWidth(ACloseBtn, APlusBtn: boolean): Integer;
+    function GetTabRectWidth(ACloseBtn, APlusBtn: boolean): Integer;
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
     function GetTabRect_X(const ARect: TRect): TRect;
@@ -122,7 +122,6 @@ type
       AModified: boolean = false;
       AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
-    procedure DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
     procedure DoUpdateTabWidths;
     procedure DoTabMenu;
   protected
@@ -539,7 +538,7 @@ begin
   Result:= Canvas.TextWidth(FTabShowPlusText);
 end;
 
-function TATTabs.GetTabWidth(ACloseBtn, APlusBtn: boolean): Integer;
+function TATTabs.GetTabRectWidth(ACloseBtn, APlusBtn: boolean): Integer;
 var
   NWidth: Integer;
 begin
@@ -569,7 +568,7 @@ begin
     for i:= 0 to TabCount-1 do
     begin
       Result.Left:= Result.Right + FTabIndentInter;
-      Result.Right:= Result.Left + TATTabData(FTabList[i]).TabWidth;
+      Result.Right:= Result.Left + FTabWidth;
       if AIndex=i then Exit;
     end;
 end;
@@ -578,7 +577,7 @@ function TATTabs.GetTabRect_Plus: TRect;
 begin
   Result:= GetTabRect(TabCount-1);
   Result.Left:= Result.Right + FTabIndentInter;
-  Result.Right:= Result.Left + GetTabWidth(false, true);
+  Result.Right:= Result.Left + GetTabRectWidth(false, true);
 end;
 
 function TATTabs.GetTabRect_X(const ARect: TRect): TRect;
@@ -838,7 +837,7 @@ begin
   Data.TabObject:= AObject;
   Data.TabModified:= AModified;
   Data.TabColor:= AColor;
-  Data.TabWidth:= GetTabWidth(FTabShowClose, false);
+  //Data.TabWidth:= GetTabRectWidth(FTabShowClose, false);
 
   FTabList.Add(Data);
   Invalidate;
@@ -900,6 +899,7 @@ begin
 end;
 {$endif}
 
+(*
 procedure TATTabs.DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
 var
   Data: TATTabData;
@@ -910,11 +910,11 @@ begin
     if ANewWidth>0 then
       Data.TabWidth:= ANewWidth
     else
-      Data.TabWidth:= GetTabWidth(FTabShowClose, false);
-    Invalidate;  
+      Data.TabWidth:= GetTabRectWidth(FTabShowClose, false);
+    Invalidate;
   end;
 end;
-
+*)
 
 procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
   AColorArr, AColorBg: TColor);
@@ -1005,34 +1005,30 @@ begin
 end;
 
 procedure TATTabs.TabMenuClick(Sender: TObject);
-var
-  NIndex: Integer;
 begin
-  NIndex:= (Sender as TComponent).Tag;
-  SetTabIndex(NIndex);
+  SetTabIndex((Sender as TComponent).Tag);
 end;
 
 procedure TATTabs.DoUpdateTabWidths;
 var
-  i, NWidth: Integer;
+  Value: Integer;
 begin
   //tricky formula: calculate auto-width
-  NWidth:= (ClientWidth
-    - IfThen(FTabShowPlus, GetTabWidth_Plus_Raw + 2*FTabIndentLeft + 2*FTabAngle)
+  Value:= (ClientWidth
+    - IfThen(FTabShowPlus, GetTabWidth_Plus_Raw + 2*FTabIndentLeft + 1*FTabAngle)
     - FTabAngle*2
-    - FTabIndentInter*1
+    - FTabIndentInter
     - FTabIndentInit
     - IfThen(FTabShowMenu, FTabIndentArrowRight)) div TabCount
       - FTabIndentInter;
 
-  if NWidth<FTabWidthMin then
-    NWidth:= FTabWidthMin
+  if Value<FTabWidthMin then
+    Value:= FTabWidthMin
   else
-  if NWidth>FTabWidthMax then
-    NWidth:= FTabWidthMax;
+  if Value>FTabWidthMax then
+    Value:= FTabWidthMax;
 
-  for i:= 0 to TabCount-1 do
-    TATTabData(FTabList[i]).TabWidth:= NWidth;
+  FTabWidth:= Value;
 end;
 
 end.
