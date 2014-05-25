@@ -59,6 +59,10 @@ begin
   t.DoAddTab('Tab middle len', nil, false, clGreen);
   t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
   t.DoAddTab('I');
+  t.DoAddTab('I');
+  t.DoAddTab('I');
+  t.DoAddTab('I');
+  t.DoAddTab('I');
 
   //-----------------------------------
   //angle tabs below
@@ -68,6 +72,7 @@ begin
   t0.Font.Size:= 12;
   t0.Height:= 56;
   t0.ColorBg:= $F9EADB;
+  t0.TabWidthMax:= 170;
   t0.TabIndentTop:= 20;
   t0.TabIndentBottom:= 6;
   t0.TabIndentXSize:= 15;
@@ -75,8 +80,7 @@ begin
   t0.TabIndentInit:= 4;
   t0.TabShowclose:= true; //false;
   t0.TabShowplus:= false;
-  t0.TabShowScroll:= false;
-  t0.TabShowMenu:= true;
+  t0.TabShowMenu:= false;
 
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
@@ -88,7 +92,6 @@ begin
   t0.Align:= alBottom;
 
   t0.Height:= 42;
-  t0.TabShowScroll:= false;
   t0.TabShowBorderActiveLow:= true;
   t0.TabIndentInit:= 2;
   t0.TabIndentBottom:= 14;
