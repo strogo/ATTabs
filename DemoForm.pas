@@ -199,19 +199,16 @@ begin
     t.DoUpdateTabWidth(i);
 end;
 
+procedure TForm1.chkPlusClick(Sender: TObject);
+begin
+  t.TabShowPlus:= chkPlus.Checked;
+  t.Invalidate;
+end;
+
 procedure TForm1.FormShow(Sender: TObject);
 begin
   chkX.Checked:= t.TabShowClose;
   chkPlus.Checked:= t.TabShowPlus;
-end;
-
-procedure TForm1.chkPlusClick(Sender: TObject);
-var
-  i: Integer;
-begin
-  t.TabShowPlus:= chkPlus.Checked;
-  for i:= 0 to t.TabCount-1 do
-    t.DoUpdateTabWidth(i);
 end;
 
 end.

@@ -630,24 +630,6 @@ begin
   C.FillRect(RBottom);
   DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
 
-  //paint passive tabs
-  for i:= 0 to TabCount-1 do
-    if i<>FTabIndex then
-    begin
-      ARect:= GetTabRect(i);
-      GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
-      DoPaintTabTo(C, ARect,
-        TATTabData(FTabList[i]).TabCaption,
-        IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
-        FColorBorderPassive,
-        FColorBorderActive,
-        TATTabData(FTabList[i]).TabColor,
-        AColorXBg,
-        AColorXBorder,
-        FTabShowClose
-        );
-    end;
-
   //paint "plus" tab
   if FTabShowPlus then
   begin
@@ -665,6 +647,24 @@ begin
       false
       );
   end;
+
+  //paint passive tabs
+  for i:= TabCount-1 downto 0 do
+    if i<>FTabIndex then
+    begin
+      ARect:= GetTabRect(i);
+      GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
+      DoPaintTabTo(C, ARect,
+        TATTabData(FTabList[i]).TabCaption,
+        IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
+        FColorBorderPassive,
+        FColorBorderActive,
+        TATTabData(FTabList[i]).TabColor,
+        AColorXBg,
+        AColorXBorder,
+        FTabShowClose
+        );
+    end;
 
   //paint active tab
   i:= FTabIndex;
