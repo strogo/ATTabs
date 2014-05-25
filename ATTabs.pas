@@ -47,23 +47,23 @@ const
 type
   TATTabs = class(TPanel)
   private
-    FColorBg: TColor;
-    FColorBorderActive: TColor;
-    FColorBorderPassive: TColor;
-    FColorTabActive: TColor;
-    FColorTabPassive: TColor;
-    FColorTabOver: TColor;
-    FColorCloseBg: TColor;
-    FColorCloseBgOver: TColor;
-    FColorCloseBorderOver: TColor;
-    FColorCloseX: TColor;
-    FColorArrow: TColor;
-    FColorArrowOver: TColor;
+    FColorBg: TColor; //color of background (visible at top and between tabs)
+    FColorBorderActive: TColor; //color of 1px border of active tab
+    FColorBorderPassive: TColor; //color of 1px border of inactive tabs
+    FColorTabActive: TColor; //color of active tab
+    FColorTabPassive: TColor; //color of inactive tabs
+    FColorTabOver: TColor; //color of inactive tabs, mouse-over
+    FColorCloseBg: TColor; //color of small square with "x" mark, inactive
+    FColorCloseBgOver: TColor; //color of small square with "x" mark, mouse-over
+    FColorCloseBorderOver: TColor; //color of 1px border of "x" mark, mouse-over
+    FColorCloseX: TColor; //color of "x" mark
+    FColorArrow: TColor; //color of "down" arrow (tab menu), inactive
+    FColorArrowOver: TColor; //color of "down" arrow, mouse-over
+    
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
-    FTabWidth: Integer; //tab width current (auto-sized)
+    FTabWidthMin: Integer; //tab minimal width (used when lot of tabs)  
+    FTabWidthMax: Integer; //tab maximal width (used when only few tabs)
     FTabWidthHideX: Integer; //tab minimal width, after which "x" mark hides for inactive tabs
-    FTabWidthMin: Integer; //tab width max
-    FTabWidthMax: Integer; //tab width min
     FTabIndentInter: Integer; //space between nearest tabs (no need for angled tabs)
     FTabIndentInit: Integer; //space between first tab and left control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
@@ -84,6 +84,8 @@ type
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
 
+    //private
+    FTabWidth: Integer; //tab width current (auto-sized)
     FTabIndex: Integer;
     FTabIndexOver: Integer;
     FTabList: TList;
@@ -113,11 +115,12 @@ type
     function IsNeedPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
     function DoAfterPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
     procedure TabMenuClick(Sender: TObject);
+    function GetTabWidth_Plus_Raw: Integer;
+    procedure DoUpdateTabWidths;
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
-    function GetTabWidth_Plus_Raw: Integer;
-    function GetTabRectWidth(ACloseBtn, APlusBtn: boolean): Integer;
+    function GetTabRectWidth(APlusBtn: boolean): Integer;
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
     function GetTabRect_X(const ARect: TRect): TRect;
@@ -131,7 +134,6 @@ type
       AModified: boolean = false;
       AColor: TColor = clNone);
     procedure DoDeleteTab(AIndex: Integer);
-    procedure DoUpdateTabWidths;
     procedure DoTabMenu;
   protected
     procedure Paint; override;
@@ -553,7 +555,7 @@ begin
   Result:= Canvas.TextWidth(FTabShowPlusText);
 end;
 
-function TATTabs.GetTabRectWidth(ACloseBtn, APlusBtn: boolean): Integer;
+function TATTabs.GetTabRectWidth(APlusBtn: boolean): Integer;
 var
   NWidth: Integer;
 begin
@@ -592,7 +594,7 @@ function TATTabs.GetTabRect_Plus: TRect;
 begin
   Result:= GetTabRect(TabCount-1);
   Result.Left:= Result.Right + FTabIndentInter;
-  Result.Right:= Result.Left + GetTabRectWidth(false, true);
+  Result.Right:= Result.Left + GetTabRectWidth(true);
 end;
 
 function TATTabs.GetTabRect_X(const ARect: TRect): TRect;

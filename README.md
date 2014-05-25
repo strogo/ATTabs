@@ -2,18 +2,12 @@ ATTabs
 ======
 
 Delphi/Lazarus component for lite tabs.  
-Currently alpha.
 
 Sample
 
 ![img](Demo1.png?raw=true)
 
-Info
-====
+Doc
+===
 
-- Each tab has props: Caption, Color, TObject, Modified. 
-- Will have all needed events. 
-- Arrow shows popup menu with list.
-- Autosize of tab widths planned.
-- Multiline not wanted.
-- "+" tab and "x" btns optional.
+Documentation is in "Wiki" page of github (button on right).
