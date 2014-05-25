@@ -1044,6 +1044,7 @@ begin
     tbShowNone: Result:= false;
     tbShowAll: Result:= true;
     tbShowActive: Result:= AIndex=FTabIndex;
+    else Result:= false;
   end;
 
   if (AIndex<>FTabIndex) and (FTabWidth<FTabWidthHideX) then
