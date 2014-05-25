@@ -31,8 +31,11 @@ type
     LockEdit: boolean;
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
-    procedure TabClose(Sender: TObject; ATabIndex: Integer;
-    var ACanClose: boolean);
+    procedure TabClose(Sender: TObject; ATabIndex: Integer; var ACanClose: boolean);
+    procedure TabDrawAfter(Sender: TObject; ATabIndex: Integer;
+      ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean);
+    procedure TabDrawBefore(Sender: TObject; ATabIndex: Integer;
+      ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean);
   public
     { Public declarations }
     t, t0: TATTabs;
@@ -42,6 +45,8 @@ var
   Form1: TForm1;
 
 implementation
+
+uses Math;
 
 {$R *.dfm}
 
@@ -71,6 +76,8 @@ begin
   t0.Align:= alBottom;
   t0.Font.Size:= 12;
   t0.Height:= 56;
+  t0.OnTabDrawBefore:= TabDrawBefore;
+  t0.OnTabDrawAfter:= TabDrawAfter;
   t0.ColorBg:= $F9EADB;
   t0.TabWidthMax:= 170;
   t0.TabIndentTop:= 20;
@@ -79,11 +86,12 @@ begin
   t0.TabIndentXInner:= 3;
   t0.TabIndentInit:= 4;
   t0.TabShowclose:= tbShowActive;
-  t0.TabShowplus:= false;
+  t0.TabShowplus:= true;//false;
   t0.TabShowMenu:= false;
 
   t0.DoAddTab('Tab');
   t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+  t0.DoAddTab('Last');
 
   //-----------------------------------
   //Firefox rectangle tabs
@@ -212,6 +220,30 @@ procedure TForm1.FormShow(Sender: TObject);
 begin
   chkX.Checked:= t.TabShowClose=tbShowAll;
   chkPlus.Checked:= t.TabShowPlus;
+end;
+
+procedure TForm1.TabDrawAfter(Sender: TObject; ATabIndex: Integer;
+  ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean);
+var
+  C: TCanvas;
+begin
+  if ATabIndex<0 then Exit;
+  C:= ACanvas;
+  C.Font.Name:= 'Tahoma';
+  C.Font.Size:= 8;
+  C.Font.Color:= clBlue;
+  C.Brush.Color:=
+    IfThen(
+      ATabIndex=(Sender as TATTabs).TabIndex,
+      (Sender as TATTabs).ColorTabActive,
+      (Sender as TATTabs).ColorTabPassive);
+  C.TextOut((ARect.Left+ARect.Right) div 2 - 8, ARect.Top, Inttostr(ATabIndex));
+end;
+
+procedure TForm1.TabDrawBefore(Sender: TObject; ATabIndex: Integer;
+  ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean);
+begin
+  ACanDraw:= true; //ATabIndex<>1;
 end;
 
 end.

@@ -30,6 +30,8 @@ type
     var ACanClose: boolean) of object;
   TATTabMenuEvent = procedure (Sender: TObject;
     var ACanShow: boolean) of object;
+  TATTabDrawEvent = procedure (Sender: TObject; ATabIndex: Integer;
+    ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean) of object;
 
 type
   TATTriType = (triDown, triLeft, triRight);
@@ -93,6 +95,8 @@ type
     FOnTabPlusClick: TNotifyEvent;
     FOnTabClose: TATTabCloseEvent;
     FOnTabMenu: TATTabMenuEvent;
+    FOnTabDrawBefore: TATTabDrawEvent;
+    FOnTabDrawAfter: TATTabDrawEvent;
 
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
@@ -106,6 +110,8 @@ type
       var AColorBg, AColorBorder: TColor);
     function IsIndexOk(AIndex: Integer): boolean;
     function IsShowX(AIndex: Integer): boolean;
+    function IsNeedPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+    function DoAfterPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
     procedure TabMenuClick(Sender: TObject);
   public
     constructor Create(AOnwer: TComponent); override;
@@ -180,6 +186,8 @@ type
     property OnTabPlusClick: TNotifyEvent read FOnTabPlusClick write FOnTabPlusClick;
     property OnTabClose: TATTabCloseEvent read FOnTabClose write FOnTabClose;
     property OnTabMenu: TATTabMenuEvent read FOnTabMenu write FOnTabMenu;
+    property OnTabDrawBefore: TATTabDrawEvent read FOnTabDrawBefore write FOnTabDrawBefore;
+    property OnTabDrawAfter: TATTabDrawEvent read FOnTabDrawAfter write FOnTabDrawAfter;
   end;
 
 implementation
@@ -419,6 +427,8 @@ begin
   FOnTabPlusClick:= nil;
   FOnTabClose:= nil;
   FOnTabMenu:= nil;
+  FOnTabDrawBefore:= nil;
+  FOnTabDrawAfter:= nil;
 end;
 
 destructor TATTabs.Destroy;
@@ -446,8 +456,8 @@ begin
   end;
 end;
 
-procedure TATTabs.DoPaintTabTo(C: TCanvas; ARect: TRect;
-  const ACaption: string;
+procedure TATTabs.DoPaintTabTo(
+  C: TCanvas; ARect: TRect; const ACaption: string;
   ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
   ACloseBtn: boolean);
 var
@@ -620,6 +630,20 @@ begin
     end;
 end;
 
+function TATTabs.IsNeedPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+begin
+  Result:= true;
+  if Assigned(FOnTabDrawBefore) then
+    FOnTabDrawBefore(Self, AIndex, ACanvas, ARect, Result);
+end;
+
+function TATTabs.DoAfterPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+begin
+  Result:= true;
+  if Assigned(FOnTabDrawAfter) then
+    FOnTabDrawAfter(Self, AIndex, ACanvas, ARect, Result);
+end;
+
 procedure TATTabs.DoPaintTo(C: TCanvas);
 var
   i: Integer;
@@ -645,16 +669,20 @@ begin
     ARect:= GetTabRect_Plus;
     AColorXBg:= clNone;
     AColorXBorder:= clNone;
-    DoPaintTabTo(C, ARect,
-      FTabShowPlusText,
-      IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
-      FColorBorderPassive,
-      FColorBorderActive,
-      clNone,
-      AColorXBg,
-      AColorXBorder,
-      false
-      );
+    if IsNeedPaintTab(-1, C, ARect) then
+    begin
+      DoPaintTabTo(C, ARect,
+        FTabShowPlusText,
+        IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
+        FColorBorderPassive,
+        FColorBorderActive,
+        clNone,
+        AColorXBg,
+        AColorXBorder,
+        false
+        );
+      DoAfterPaintTab(-1, C, ARect);
+    end;    
   end;
 
   //paint passive tabs
@@ -663,16 +691,20 @@ begin
     begin
       ARect:= GetTabRect(i);
       GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
-      DoPaintTabTo(C, ARect,
-        TATTabData(FTabList[i]).TabCaption,
-        IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
-        FColorBorderPassive,
-        FColorBorderActive,
-        TATTabData(FTabList[i]).TabColor,
-        AColorXBg,
-        AColorXBorder,
-        IsShowX(i)
-        );
+      if IsNeedPaintTab(i, C, ARect) then
+      begin
+        DoPaintTabTo(C, ARect,
+          TATTabData(FTabList[i]).TabCaption,
+          IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
+          FColorBorderPassive,
+          FColorBorderActive,
+          TATTabData(FTabList[i]).TabColor,
+          AColorXBg,
+          AColorXBorder,
+          IsShowX(i)
+          );
+        DoAfterPaintTab(i, C, ARect);
+      end;
     end;
 
   //paint active tab
@@ -681,16 +713,20 @@ begin
   begin
     ARect:= GetTabRect(i);
     GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
-    DoPaintTabTo(C, ARect,
-      TATTabData(FTabList[i]).TabCaption,
-      FColorTabActive,
-      FColorBorderActive,
-      IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
-      TATTabData(FTabList[i]).TabColor,
-      AColorXBg,
-      AColorXBorder,
-      IsShowX(i)
-      );
+    if IsNeedPaintTab(i, C, ARect) then
+    begin
+      DoPaintTabTo(C, ARect,
+        TATTabData(FTabList[i]).TabCaption,
+        FColorTabActive,
+        FColorBorderActive,
+        IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
+        TATTabData(FTabList[i]).TabColor,
+        AColorXBg,
+        AColorXBorder,
+        IsShowX(i)
+        );
+      DoAfterPaintTab(i, C, ARect);
+    end;  
   end;
 
   //paint arrows
