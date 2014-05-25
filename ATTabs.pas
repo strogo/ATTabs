@@ -535,6 +535,7 @@ begin
     C.FillRect(RText);
     C.Pen.Color:= IfThen(ATabCloseBorder<>clNone, ATabCloseBorder, ATabBg);
     C.Rectangle(RText);
+    C.Brush.Color:= ATabBg;
 
     C.Pen.Color:= FColorCloseX;
     C.Pen.Width:= 2;
