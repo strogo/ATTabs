@@ -60,14 +60,14 @@ begin
   t.OnTabPlusClick:= {$ifdef FPC}@{$endif} TabPlusClick;
   t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
 
-  t.DoAddTab('Tab');
-  t.DoAddTab('Tab middle len', nil, false, clGreen);
-  t.DoAddTab('Tab ________________________________________________________', nil, false, clBlue);
-  t.DoAddTab('I');
-  t.DoAddTab('I');
-  t.DoAddTab('I');
-  t.DoAddTab('I');
-  t.DoAddTab('I');
+  t.AddTab(-1, 'Tab');
+  t.AddTab(-1, 'Tab middle len', nil, false, clGreen);
+  t.AddTab(-1, 'Tab ________________________________________________________', nil, false, clBlue);
+  t.AddTab(-1, 'I');
+  t.AddTab(-1, 'I');
+  t.AddTab(-1, 'I');
+  t.AddTab(-1, 'I');
+  t.AddTab(-1, 'I');
 
   //-----------------------------------
   //angle tabs below
@@ -89,9 +89,9 @@ begin
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
 
-  t0.DoAddTab('Tab');
-  t0.DoAddTab('Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
-  t0.DoAddTab('Last');
+  t0.AddTab(-1, 'Tab');
+  t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+  t0.AddTab(-1, 'Last');
 
   //-----------------------------------
   //Firefox rectangle tabs
@@ -121,19 +121,19 @@ begin
 
   t0.TabAngle:= 0;
   t0.TabIndentInter:= 2;
-  t0.DoAddTab('Firefox');
-  t0.DoAddTab('A tab _____________________________________________________', nil, false, clGreen);
-  t0.DoAddTab('Tab middle len', nil, false, clBlue);
+  t0.AddTab(-1, 'Firefox');
+  t0.AddTab(-1, 'A tab _____________________________________________________', nil, false, clGreen);
+  t0.AddTab(-1, 'Tab middle len', nil, false, clBlue);
 end;
 
 procedure TForm1.bAddClick(Sender: TObject);
 begin
-  t.DoAddTab('test '+StringOfChar('n', Random(20)), nil, false, Random(65000));
+  t.AddTab(t.TabIndex+1, 'test '+StringOfChar('n', Random(20)), nil, false, Random(65000));
 end;
 
 procedure TForm1.bDelClick(Sender: TObject);
 begin
-  t.DoDeleteTab(1);
+  t.DeleteTab(1);
 end;
 
 procedure TForm1.bColorClick(Sender: TObject);

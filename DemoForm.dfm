@@ -17,11 +17,11 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object bAdd: TButton
-    Left = 200
+    Left = 160
     Top = 192
-    Width = 75
+    Width = 115
     Height = 25
-    Caption = 'add'
+    Caption = 'add after current'
     TabOrder = 0
     OnClick = bAddClick
   end

@@ -129,12 +129,14 @@ type
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
     property TabIndex: Integer read FTabIndex write SetTabIndex;
-    procedure DoAddTab(const ACaption: string;
+    procedure AddTab(
+      AIndex: Integer;
+      const ACaption: string;
       AObject: TObject = nil;
       AModified: boolean = false;
       AColor: TColor = clNone);
-    procedure DoDeleteTab(AIndex: Integer);
-    procedure DoTabMenu;
+    procedure DeleteTab(AIndex: Integer);
+    procedure ShowTabMenu;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -820,7 +822,7 @@ begin
 
       cAtArrowDown:
         begin
-          DoTabMenu;
+          ShowTabMenu;
           Exit
         end;
 
@@ -839,7 +841,7 @@ begin
             R:= GetTabRect_X(R);
             if PtInRect(R, Point(X, Y)) then
             begin
-              DoDeleteTab(FTabIndexOver);
+              DeleteTab(FTabIndexOver);
               Exit
             end;
           end;
@@ -867,7 +869,8 @@ begin
 end;
 
 
-procedure TATTabs.DoAddTab(
+procedure TATTabs.AddTab(
+  AIndex: Integer;
   const ACaption: string;
   AObject: TObject = nil;
   AModified: boolean = false;
@@ -882,11 +885,15 @@ begin
   Data.TabColor:= AColor;
   //Data.TabWidth:= GetTabRectWidth(FTabShowClose, false);
 
-  FTabList.Add(Data);
+  if IsIndexOk(AIndex) then
+    FTabList.Insert(AIndex, Data)
+  else
+    FTabList.Add(Data);
+
   Invalidate;
 end;
 
-procedure TATTabs.DoDeleteTab(AIndex: Integer);
+procedure TATTabs.DeleteTab(AIndex: Integer);
 var
   CanClose: boolean;
 begin
@@ -1011,7 +1018,7 @@ begin
   RDown.Left:= RDown.Right-FTabIndentArrowRight;
 end;
 
-procedure TATTabs.DoTabMenu;
+procedure TATTabs.ShowTabMenu;
 var
   i: Integer;
   mi: TMenuItem;
