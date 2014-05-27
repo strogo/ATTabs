@@ -51,7 +51,6 @@ type
     FMouseDown: boolean;
     FMouseDownPnt: TPoint;
     FMouseDrag: boolean;
-    FMouseCursorPrev: TCursor;
 
     //colors
     FColorBg: TColor; //color of background (visible at top and between tabs)
@@ -396,7 +395,6 @@ begin
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
   FMouseDrag:= false;
-  FMouseCursorPrev:= crDefault;
 
   FColorBg:= clBlack;
   FColorDrop:= $6060E0;
@@ -713,7 +711,7 @@ begin
     begin
       DoPaintTabTo(C, ARect,
         FTabShowPlusText,
-        IfThen(FTabIndexOver=cAtTabPlus, FColorTabOver, FColorTabPassive),
+        IfThen((FTabIndexOver=cAtTabPlus) and not FMouseDrag, FColorTabOver, FColorTabPassive),
         FColorBorderPassive,
         FColorBorderActive,
         clNone,
@@ -735,7 +733,7 @@ begin
       begin
         DoPaintTabTo(C, ARect,
           TATTabData(FTabList[i]).TabCaption,
-          IfThen(i=FTabIndexOver, FColorTabOver, FColorTabPassive),
+          IfThen((i=FTabIndexOver) and not FMouseDrag, FColorTabOver, FColorTabPassive),
           FColorBorderPassive,
           FColorBorderActive,
           TATTabData(FTabList[i]).TabColor,
@@ -868,7 +866,7 @@ begin
   if FMouseDrag then
   begin
     FMouseDrag:= false;
-    Screen.Cursor:= FMouseCursorPrev;
+    Screen.Cursor:= crDefault;
     DoTabDrop;
   end;
 end;
