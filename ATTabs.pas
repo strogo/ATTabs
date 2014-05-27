@@ -933,7 +933,7 @@ begin
   FTabIndexOver:= GetTabAt(X, Y);
   FTabIndexDrop:= FTabIndexOver;
 
-  if FMouseDown and FTabDragEnabled then
+  if FMouseDown and FTabDragEnabled and (TabCount>1) then
   begin
     if (Abs(X-FMouseDownPnt.X)>cDragMin) or
        (Abs(Y-FMouseDownPnt.Y)>cDragMin) then
