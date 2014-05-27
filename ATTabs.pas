@@ -416,7 +416,7 @@ begin
   FTabWidthHideX:= 55;
   FTabDragCursor:= crDrag;
   FTabIndentLeft:= 8;
-  FTabIndentDropI:= 3;
+  FTabIndentDropI:= 4;
   FTabIndentInter:= 0;
   FTabIndentInit:= 4;
   FTabIndentTop:= 5;
@@ -799,11 +799,11 @@ begin
   if i<>FTabIndex then
   begin
     R:= GetTabRect(i);
-    C.Pen.Width:= FTabIndentDropI;
-    C.Pen.Color:= FColorDrop;
-    C.MoveTo(IfThen(i<=FTabIndex, R.Left, R.Right), R.Top);
-    C.LineTo(IfThen(i<=FTabIndex, R.Left, R.Right), R.Bottom);
-    C.Pen.Width:= 1;
+    R.Left:= IfThen(i<=FTabIndex, R.Left, R.Right);
+    R.Left:= R.Left - FTabIndentDropI div 2;
+    R.Right:= R.Left + FTabIndentDropI - FTabIndentDropI div 2 + 1;
+    C.Brush.Color:= FColorDrop;
+    C.FillRect(R);
   end;
 end;
 
