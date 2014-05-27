@@ -92,7 +92,7 @@ type
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: string; //text of "plus" tab
-    FTabShowScroll: boolean; //show scroll arrows (not implemented)
+    //FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabDragEnabled: boolean;
@@ -433,7 +433,7 @@ begin
   FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
   FTabShowPlusText:= '+';
-  FTabShowScroll:= false; //not supported
+  //FTabShowScroll:= false;
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabDragEnabled:= true;
@@ -770,6 +770,7 @@ begin
   //paint arrows
   GetArrowRect(AArrowLeft, AArrowRight, AArrowDown);
 
+  {//not implemented
   if FTabShowScroll then
   begin
     DoPaintArrowTo(C, triLeft, AArrowLeft,
@@ -777,11 +778,12 @@ begin
     DoPaintArrowTo(C, triRight, AArrowRight,
       IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow), FColorBg);
   end;
+  }
 
   if FTabShowMenu then
   begin
     DoPaintArrowTo(C, triDown, AArrowDown,
-      IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow), FColorBg);
+      IfThen((FTabIndexOver=cAtArrowDown) and not FMouseDrag, FColorArrowOver, FColorArrow), FColorBg);
   end;
 
   //paint drop mark
@@ -820,6 +822,7 @@ begin
   //arrows?
   GetArrowRect(RLeft, RRight, RDown);
 
+  {
   if FTabShowScroll then
     if PtInRect(RLeft, Pnt) then
     begin
@@ -833,6 +836,7 @@ begin
       Result:= cAtArrowRight;
       Exit
     end;
+  }  
 
   if FTabShowMenu then
     if PtInRect(RDown, Pnt) then
@@ -894,6 +898,8 @@ begin
 
       cAtArrowDown:
         begin
+          FMouseDown:= false;
+          FMouseDrag:= false;
           ShowTabMenu;
           Exit
         end;
