@@ -47,7 +47,15 @@ const
 type
   TATTabs = class(TPanel)
   private
+    //drag-drop
+    FMouseDown: boolean;
+    FMouseDownPnt: TPoint;
+    FMouseDrag: boolean;
+    FMouseCursorPrev: TCursor;
+
+    //colors
     FColorBg: TColor; //color of background (visible at top and between tabs)
+    FColorDrop: TColor;
     FColorBorderActive: TColor; //color of 1px border of active tab
     FColorBorderPassive: TColor; //color of 1px border of inactive tabs
     FColorTabActive: TColor; //color of active tab
@@ -59,11 +67,14 @@ type
     FColorCloseX: TColor; //color of "x" mark
     FColorArrow: TColor; //color of "down" arrow (tab menu), inactive
     FColorArrowOver: TColor; //color of "down" arrow, mouse-over
-    
+
+    //spaces
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
-    FTabWidthMin: Integer; //tab minimal width (used when lot of tabs)  
+    FTabWidthMin: Integer; //tab minimal width (used when lot of tabs)
     FTabWidthMax: Integer; //tab maximal width (used when only few tabs)
     FTabWidthHideX: Integer; //tab minimal width, after which "x" mark hides for inactive tabs
+    FTabDragCursor: TCursor;
+    FTabIndentDropI: Integer;
     FTabIndentInter: Integer; //space between nearest tabs (no need for angled tabs)
     FTabIndentInit: Integer; //space between first tab and left control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
@@ -77,17 +88,21 @@ type
     FTabIndentArrowSize: Integer; //half-size of "arrow" mark
     FTabIndentArrowLeft: Integer; //space from scroll-arrows to left control edge
     FTabIndentArrowRight: Integer; //width of down-arrow area at right
+
+    //show
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: string; //text of "plus" tab
     FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
+    FTabDragEnabled: boolean;
 
-    //private
+    //otherrs
     FTabWidth: Integer; //tab width current (auto-sized)
     FTabIndex: Integer;
     FTabIndexOver: Integer;
+    FTabIndexDrop: Integer;
     FTabList: TList;
     FTabMenu: TPopupMenu;
 
@@ -107,6 +122,7 @@ type
       ACloseBtn: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
       AColorArr, AColorBg: TColor);
+    procedure DoPaintDropMark(C: TCanvas);
     procedure SetTabIndex(AIndex: Integer);
     procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect;
       var AColorBg, AColorBorder: TColor);
@@ -117,6 +133,7 @@ type
     procedure TabMenuClick(Sender: TObject);
     function GetTabWidth_Plus_Raw: Integer;
     procedure DoUpdateTabWidths;
+    procedure DoTabDrop;
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
@@ -141,6 +158,7 @@ type
     procedure Paint; override;
     procedure Resize; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
@@ -149,6 +167,7 @@ type
     //copied by multi-carets in Synwrite
     //colors
     property ColorBg: TColor read FColorBg write FColorBg;
+    property ColorDrop: TColor read FColorDrop write FColorDrop;
     property ColorBorderActive: TColor read FColorBorderActive write FColorBorderActive;
     property ColorBorderPassive: TColor read FColorBorderPassive write FColorBorderPassive;
     property ColorTabActive: TColor read FColorTabActive write FColorTabActive;
@@ -164,6 +183,7 @@ type
     property TabAngle: Integer read FTabAngle write FTabAngle;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
     property TabWidthMax: Integer read FTabWidthMax write FTabWidthMax;
+    property TabIndentDropI: Integer read FTabIndentDropI write FTabIndentDropI;
     property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
     property TabIndentLeft: Integer read FTabIndentLeft write FTabIndentLeft;
@@ -184,6 +204,8 @@ type
     //property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll; //disabled
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
+    property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
+    property TabDragCursor: TCursor read FTabDragCursor write FTabDragCursor;
 
     //events
     property OnTabClick: TNotifyEvent read FOnTabClick write FOnTabClick;
@@ -245,6 +267,7 @@ begin
   //speed up drawing (AT)
   if (AX1 = AX2) or (AY1 = AY2) then
   begin
+    Canvas.Pen.Width:= 1;
     Canvas.Pen.Color := LineColor;
     Canvas.MoveTo(AX1, AY1);
     Canvas.LineTo(AX2, AY2);
@@ -370,7 +393,13 @@ begin
   Width:= 400;
   Height:= 35;
 
+  FMouseDown:= false;
+  FMouseDownPnt:= Point(0, 0);
+  FMouseDrag:= false;
+  FMouseCursorPrev:= crDefault;
+
   FColorBg:= clBlack;
+  FColorDrop:= $6060E0;
   FColorTabActive:= $808080;
   FColorTabPassive:= $786868;
   FColorTabOver:= $A08080;
@@ -387,7 +416,9 @@ begin
   FTabWidthMin:= 26;
   FTabWidthMax:= 130;
   FTabWidthHideX:= 55;
+  FTabDragCursor:= crDrag;
   FTabIndentLeft:= 8;
+  FTabIndentDropI:= 3;
   FTabIndentInter:= 0;
   FTabIndentInit:= 4;
   FTabIndentTop:= 5;
@@ -407,6 +438,7 @@ begin
   FTabShowScroll:= false; //not supported
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
+  FTabDragEnabled:= true;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -622,6 +654,9 @@ var
 begin
   AColorBg:= FColorCloseBg;
   AColorBorder:= FColorCloseBg;
+
+  if FMouseDrag then Exit;
+
   if IsShowX(AIndex) then
     if AIndex=FTabIndexOver then
     begin
@@ -750,6 +785,28 @@ begin
     DoPaintArrowTo(C, triDown, AArrowDown,
       IfThen(FTabIndexOver=cAtArrowDown, FColorArrowOver, FColorArrow), FColorBg);
   end;
+
+  //paint drop mark
+  if FMouseDrag then
+    DoPaintDropMark(C);
+end;
+
+procedure TATTabs.DoPaintDropMark(C: TCanvas);
+var
+  i: Integer;
+  R: TRect;
+begin
+  i:= FTabIndexDrop;
+  if i<0 then i:= TabCount-1;
+  if i<>FTabIndex then
+  begin
+    R:= GetTabRect(i);
+    C.Pen.Width:= FTabIndentDropI;
+    C.Pen.Color:= FColorDrop;
+    C.MoveTo(IfThen(i<=FTabIndex, R.Left, R.Right), R.Top);
+    C.LineTo(IfThen(i<=FTabIndex, R.Left, R.Right), R.Bottom);
+    C.Pen.Width:= 1;
+  end;
 end;
 
 
@@ -800,14 +857,31 @@ begin
     begin
       Result:= cAtTabPlus;
       Exit
-    end;  
+    end;
 end;
+
+procedure TATTabs.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  FMouseDown:= false;
+  FMouseDownPnt:= Point(0, 0);
+
+  if FMouseDrag then
+  begin
+    FMouseDrag:= false;
+    Screen.Cursor:= FMouseCursorPrev;
+    DoTabDrop;
+  end;
+end;
+
 
 procedure TATTabs.MouseDown(Button: TMouseButton; Shift: TShiftState;
   X, Y: Integer);
 var
   R: TRect;
 begin
+  FMouseDown:= true;
+  FMouseDownPnt:= Point(X, Y);
+
   FTabIndexOver:= GetTabAt(X, Y);
 
   if Button=mbLeft then
@@ -852,9 +926,23 @@ begin
 end;
 
 procedure TATTabs.MouseMove(Shift: TShiftState; X, Y: Integer);
+const
+  cDragMin = 10;
 begin
   inherited;
   FTabIndexOver:= GetTabAt(X, Y);
+  FTabIndexDrop:= FTabIndexOver;
+
+  if FMouseDown and FTabDragEnabled then
+  begin
+    if (Abs(X-FMouseDownPnt.X)>cDragMin) or
+       (Abs(Y-FMouseDownPnt.Y)>cDragMin) then
+    begin
+      FMouseDrag:= true;
+      Screen.Cursor:= FTabDragCursor;
+    end;
+  end;
+
   Invalidate;
 end;
 
@@ -1097,4 +1185,19 @@ begin
     Result:= false;
 end;
 
+procedure TATTabs.DoTabDrop;
+var
+  NFrom, NTo: Integer;
+begin
+  NFrom:= FTabIndex;
+  if NFrom<0 then Exit;
+  NTo:= FTabIndexDrop;
+  if NTo<0 then NTo:= TabCount-1;
+  if NFrom=NTo then Exit;  
+
+  FTabList.Move(NFrom, NTo);
+  SetTabIndex(NTo);
+end;
+
 end.
+

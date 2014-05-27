@@ -88,6 +88,7 @@ begin
   t0.TabShowclose:= tbShowActive;
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
+  t0.TabIndentDropI:= 5;
 
   t0.AddTab(-1, 'Tab');
   t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
@@ -121,6 +122,8 @@ begin
 
   t0.TabAngle:= 0;
   t0.TabIndentInter:= 2;
+  t0.TabDragEnabled:= false;
+
   t0.AddTab(-1, 'Firefox');
   t0.AddTab(-1, 'A tab _____________________________________________________', nil, false, clGreen);
   t0.AddTab(-1, 'Tab middle len', nil, false, clBlue);
@@ -138,10 +141,10 @@ end;
 
 procedure TForm1.bColorClick(Sender: TObject);
 var
-  Data: TATTabData;
+  d: TATTabData;
 begin
-  Data:= t.GetTabData(t.tabindex);
-  Data.TabColor:= Random(60000);
+  d:= t.GetTabData(t.tabindex);
+  d.TabColor:= Random(60000);
   t.Invalidate;
 end;
 
