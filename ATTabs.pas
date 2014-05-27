@@ -550,9 +550,11 @@ begin
   DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
   DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
 
-  //tweak for border corners
+  {
+  //clear corner pixels
   C.Pixels[PL1.X, PL1.Y]:= FColorBg;
   C.Pixels[PR1.X, PR1.Y]:= FColorBg;
+  }
 
   //color mark
   if ATabHilite<>clNone then
