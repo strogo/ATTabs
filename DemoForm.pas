@@ -79,16 +79,17 @@ begin
   t0.OnTabDrawBefore:= {$ifdef FPC}@{$endif} TabDrawBefore;
   t0.OnTabDrawAfter:= {$ifdef FPC}@{$endif} TabDrawAfter;
   t0.ColorBg:= $F9EADB;
+
+  t0.TabHeight:= 30;
   t0.TabWidthMax:= 170;
   t0.TabIndentTop:= 20;
-  t0.TabIndentBottom:= 6;
   t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
   t0.TabIndentInit:= 4;
   t0.TabShowclose:= tbShowActive;
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
-  t0.TabIndentDropI:= 5;
+  t0.TabIndentDropI:= 6;
 
   t0.AddTab(-1, 'Tab');
   t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
@@ -103,7 +104,6 @@ begin
   t0.Height:= 42;
   t0.TabShowBorderActiveLow:= true;
   t0.TabIndentInit:= 2;
-  t0.TabIndentBottom:= 14;
   t0.TabIndentTop:= 4;
   t0.TabIndentXSize:= 13;
   t0.Font.Color:= clBlack;

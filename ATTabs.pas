@@ -69,17 +69,16 @@ type
 
     //spaces
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
+    FTabHeight: Integer;
     FTabWidthMin: Integer; //tab minimal width (used when lot of tabs)
     FTabWidthMax: Integer; //tab maximal width (used when only few tabs)
     FTabWidthHideX: Integer; //tab minimal width, after which "x" mark hides for inactive tabs
-    FTabDragCursor: TCursor;
     FTabIndentDropI: Integer;
     FTabIndentInter: Integer; //space between nearest tabs (no need for angled tabs)
     FTabIndentInit: Integer; //space between first tab and left control edge
     FTabIndentLeft: Integer; //space between text and tab left edge
     FTabIndentText: Integer; //space between text and tab top edge
     FTabIndentTop: Integer; //height of top empty space (colored with bg)
-    FTabIndentBottom: Integer; //height of bottom empty space (colored with active tab)
     FTabIndentXRight: Integer; //space from "x" btn to right tab edge
     FTabIndentXInner: Integer; //space from "x" square edge to "x" mark
     FTabIndentXSize: Integer; //size of "x" mark
@@ -96,9 +95,10 @@ type
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabDragEnabled: boolean;
+    FTabDragCursor: TCursor;
 
     //otherrs
-    FTabWidth: Integer; //tab width current (auto-sized)
+    FTabWidth: Integer;
     FTabIndex: Integer;
     FTabIndexOver: Integer;
     FTabIndexDrop: Integer;
@@ -180,6 +180,7 @@ type
     property ColorArrowOver: TColor read FColorArrowOver write FColorArrowOver;
     //spaces
     property TabAngle: Integer read FTabAngle write FTabAngle;
+    property TabHeight: Integer read FTabHeight write FTabHeight;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
     property TabWidthMax: Integer read FTabWidthMax write FTabWidthMax;
     property TabIndentDropI: Integer read FTabIndentDropI write FTabIndentDropI;
@@ -188,7 +189,6 @@ type
     property TabIndentLeft: Integer read FTabIndentLeft write FTabIndentLeft;
     property TabIndentText: Integer read FTabIndentText write FTabIndentText;
     property TabIndentTop: Integer read FTabIndentTop write FTabIndentTop;
-    property TabIndentBottom: Integer read FTabIndentBottom write FTabIndentBottom;
     property TabIndentXRight: Integer read FTabIndentXRight write FTabIndentXRight;
     property TabIndentXInner: Integer read FTabIndentXInner write FTabIndentXInner;
     property TabIndentXSize: Integer read FTabIndentXSize write FTabIndentXSize;
@@ -411,6 +411,7 @@ begin
   FColorArrowOver:= $E0E0E0;
 
   FTabAngle:= 5;
+  FTabHeight:= 24;
   FTabWidthMin:= 26;
   FTabWidthMax:= 130;
   FTabWidthHideX:= 55;
@@ -420,7 +421,6 @@ begin
   FTabIndentInter:= 0;
   FTabIndentInit:= 4;
   FTabIndentTop:= 5;
-  FTabIndentBottom:= 6;
   FTabIndentText:= 6;
   FTabIndentXRight:= 3;
   FTabIndentXInner:= 3;
@@ -613,7 +613,7 @@ begin
   Result.Left:= FTabIndentInit+FTabAngle;
   Result.Right:= Result.Left;
   Result.Top:= FTabIndentTop;
-  Result.Bottom:= ClientHeight-FTabIndentBottom;
+  Result.Bottom:= Result.Top+FTabHeight;
 
   if IsIndexOk(AIndex) then
     for i:= 0 to TabCount-1 do
@@ -698,7 +698,7 @@ begin
   DoUpdateTabWidths;
 
   //paint bottom rect
-  RBottom:= Rect(0, ClientHeight-FTabIndentBottom, ClientWidth, ClientHeight);
+  RBottom:= Rect(0, FTabIndentTop+FTabHeight, ClientWidth, ClientHeight);
   C.Brush.Color:= FColorTabActive;
   C.FillRect(RBottom);
   DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
@@ -1096,7 +1096,7 @@ end;
 procedure TATTabs.GetArrowRect(var RLeft, RRight, RDown: TRect);
 begin
   RLeft.Top:= FTabIndentTop;
-  RLeft.Bottom:= ClientHeight-FTabIndentBottom;
+  RLeft.Bottom:= RLeft.Top+FTabHeight;
   RRight.Top:= RLeft.Top;
   RRight.Bottom:= RLeft.Bottom;
   RDown.Top:= RLeft.Top;
