@@ -5,9 +5,9 @@ Delphi/Lazarus component for lite tabs.
 
 Sample
 
-![img](Demo1.png?raw=true)
+![img](Demo.png?raw=true)
 
 Doc
 ===
 
-Documentation is in "Wiki" page of github (button on right).
+Documentation is at "Wiki" page of github.
