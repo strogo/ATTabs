@@ -160,11 +160,13 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    {$ifdef fpc}
+    procedure MouseLeave; override;
+    {$endif}
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
   published
-    //copied by multi-carets in Synwrite
     //colors
     property ColorBg: TColor read FColorBg write FColorBg;
     property ColorDrop: TColor read FColorDrop write FColorDrop;
@@ -1196,6 +1198,15 @@ begin
   FTabList.Move(NFrom, NTo);
   SetTabIndex(NTo);
 end;
+
+{$ifdef fpc}
+procedure TATTabs.MouseLeave;
+begin
+  inherited;
+  FTabIndexOver:= -1;
+  Invalidate;
+end;
+{$endif}
 
 end.
 
