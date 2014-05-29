@@ -41,9 +41,7 @@ type
 const
   cAtTabNone = -1; //none tab
   cAtTabPlus = -2;
-  cAtArrowLeft = -3;
-  cAtArrowRight = -4;
-  cAtArrowDown = -5;
+  cAtArrowDown = -3;
 
 type
   TATTabs = class(TPanel)
@@ -879,23 +877,14 @@ var
 begin
   FMouseDown:= true;
   FMouseDownPnt:= Point(X, Y);
-
   FTabIndexOver:= GetTabAt(X, Y);
 
   if Button=mbLeft then
   begin
     case FTabIndexOver of
-      cAtArrowLeft,
-      cAtArrowRight:
-        begin
-          Beep;
-          Exit
-        end;
-
       cAtArrowDown:
         begin
           FMouseDown:= false;
-          FMouseDrag:= false;
           FTabIndexOver:= -1;
           Invalidate;
           ShowTabMenu;
@@ -904,6 +893,8 @@ begin
 
       cAtTabPlus:
         begin
+          FMouseDown:= false;
+          FTabIndexOver:= -1;
           if Assigned(FOnTabPlusClick) then
             FOnTabPlusClick(Self);
           Exit;
@@ -929,7 +920,7 @@ end;
 
 procedure TATTabs.MouseMove(Shift: TShiftState; X, Y: Integer);
 const
-  cDragMin = 10;
+  cDragMin = 10; //mouse must move by NN pixels to start drag
 begin
   inherited;
   FTabIndexOver:= GetTabAt(X, Y);
