@@ -39,6 +39,7 @@ type
 
 //int constants for GetTabAt
 const
+  cAtTabNone = -1; //none tab
   cAtTabPlus = -2;
   cAtArrowLeft = -3;
   cAtArrowRight = -4;
@@ -342,31 +343,22 @@ begin
       P1:= Point(R.Left, R.Top);
       P2:= Point(R.Right, R.Top);
       P3:= Point((R.Left+R.Right) div 2, R.Bottom);
-      //DrawTriangleRaw(C, P1, P2, P3, Color);
-      //paint little shifted line - w/out antialiasing
-      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X, P3.Y-1), Color);
     end;
     triRight:
     begin
       P1:= Point(R.Left, R.Top);
       P2:= Point(R.Left, R.Bottom);
       P3:= Point(R.Right, (R.Top+R.Bottom) div 2);
-      //DrawTriangleRaw(C, P1, P2, P3, Color);
-      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X-1, P3.Y), Color);
     end;
     triLeft:
     begin
       P1:= Point(R.Right, R.Top);
       P2:= Point(R.Right, R.Bottom);
       P3:= Point(R.Left, (R.Top+R.Bottom) div 2);
-      //DrawTriangleRaw(C, P1, P2, P3, Color);
-      DrawTriangleRaw(C, Point(P1.X, P1.Y), Point(P2.X, P2.Y), Point(P3.X+1, P3.Y), Color);
     end;
   end;
 
-  //paint line with correct coords- antialiased
-  DrawAntialisedLine(C, P1.X, P1.Y, P3.X, P3.Y, Color);
-  DrawAntialisedLine(C, P2.X, P2.Y, P3.X, P3.Y, Color);
+  DrawTriangleRaw(C, P1, P2, P3, Color);
 end;
 
 { TATTabs }
@@ -902,6 +894,8 @@ begin
         begin
           FMouseDown:= false;
           FMouseDrag:= false;
+          FTabIndexOver:= -1;
+          Invalidate;
           ShowTabMenu;
           Exit
         end;
@@ -1062,8 +1056,6 @@ end;
 
 procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
   AColorArr, AColorBg: TColor);
-const
-  cRatio = 0.866; //sqrt(3)/2
 var
   P: TPoint;
   R: TRect;
@@ -1078,12 +1070,12 @@ begin
     triRight:
       begin
         SizeY:= N;
-        SizeX:= Trunc(N*cRatio);
+        SizeX:= N div 2;
       end;
     else
       begin
         SizeX:= N;
-        SizeY:= Trunc(N*cRatio);
+        SizeY:= N div 2;
       end;
   end;
 
