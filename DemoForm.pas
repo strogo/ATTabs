@@ -3,7 +3,10 @@ unit DemoForm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  {$ifndef fpc}
+  Windows,
+  {$endif}
+  SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, ATTabs;
 
 type
@@ -179,17 +182,19 @@ end;
 
 procedure TForm1.TabClose(Sender: TObject; ATabIndex: Integer;
   var ACanClose: boolean);
+{
 var
   d: TATTabData;
   s: string;
+  }
 begin
+  {
   d:= (Sender as TATTabs).GetTabData(ATabIndex);
   if d=nil then Exit;
   s:= d.TabCaption;
-
-  ACanClose:= true; //Pos('Tab', s)>0;
-  if not ACanClose then
-    MessageBeep(mb_iconwarning);
+  ACanClose:= Pos('Tab', s)>0;
+  }
+  ACanClose:= true;
 end;
 
 procedure TForm1.Edit1Change(Sender: TObject);

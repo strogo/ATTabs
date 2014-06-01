@@ -488,6 +488,7 @@ procedure TATTabs.DoPaintTabTo(
   ACloseBtn: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
+  PX1, PX2, PX3, PX4, PXX1, PXX2: TPoint;
   RText: TRect;
   NIndentL, NIndentR: Integer;
 begin
@@ -565,13 +566,27 @@ begin
     C.Rectangle(RText);
     C.Brush.Color:= ATabBg;
 
+    //paint cross by 2 polygons, each has 6 points (3 points at line edge) 
+    C.Brush.Color:= FColorCloseX;
     C.Pen.Color:= FColorCloseX;
-    C.Pen.Width:= 2;
-    C.MoveTo(RText.Left+FTabIndentXInner, RText.Top+FTabIndentXInner);
-    C.LineTo(RText.Right-FTabIndentXInner-1, RText.Bottom-FTabIndentXInner-1);
-    C.MoveTo(RText.Left+FTabIndentXInner, RText.Bottom-FTabIndentXInner-1);
-    C.LineTo(RText.Right-FTabIndentXInner-1, RText.Top+FTabIndentXInner);
-    C.Pen.Width:= 1;
+
+    PXX1:= Point(RText.Left+FTabIndentXInner, RText.Top+FTabIndentXInner);
+    PXX2:= Point(RText.Right-FTabIndentXInner-1, RText.Bottom-FTabIndentXInner-1);
+    PX1:= Point(PXX1.X+1, PXX1.Y);
+    PX2:= Point(PXX1.X, PXX1.Y+1);
+    PX3:= Point(PXX2.X-1, PXX2.Y);
+    PX4:= Point(PXX2.X, PXX2.Y-1);
+    C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
+
+    PXX1:= Point(RText.Right-FTabIndentXInner-1, RText.Top+FTabIndentXInner);
+    PXX2:= Point(RText.Left+FTabIndentXInner, RText.Bottom-FTabIndentXInner-1);
+    PX1:= Point(PXX1.X-1, PXX1.Y);
+    PX2:= Point(PXX1.X, PXX1.Y+1);
+    PX3:= Point(PXX2.X+1, PXX2.Y);
+    PX4:= Point(PXX2.X, PXX2.Y-1);
+    C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
+
+    C.Brush.Color:= ATabBg;
   end;
 end;
 
