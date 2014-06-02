@@ -1,3 +1,9 @@
+{
+ATTabs component for Delphi/Lazarus
+Copyright (c) Alexey Torgashin (UVViewSoft)
+License: MPL 2.0
+}
+
 unit ATTabs;
 
 interface
