@@ -32,11 +32,23 @@ type
   end;
 
 type
+  TATTabElemType = (
+    aeTabActive,
+    aeTabPassive,
+    aeTabPassiveOver,
+    aeTabPlus,
+    aeTabPlusOver,
+    aeXButton,
+    aeXButtonOver
+    );
+
+type
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
     var ACanClose: boolean) of object;
   TATTabMenuEvent = procedure (Sender: TObject;
     var ACanShow: boolean) of object;
-  TATTabDrawEvent = procedure (Sender: TObject; ATabIndex: Integer;
+  TATTabDrawEvent = procedure (Sender: TObject;
+    AElemType: TATTabElemType; ATabIndex: Integer;
     ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean) of object;
 
 type
@@ -126,14 +138,18 @@ type
       ACloseBtn: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
       AColorArr, AColorBg: TColor);
+    procedure DoPaintXTo(C: TCanvas; const R: TRect;
+      ATabBg, ATabCloseBg, ATabCloseBorder: TColor);
     procedure DoPaintDropMark(C: TCanvas);
     procedure SetTabIndex(AIndex: Integer);
     procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect;
       var AColorBg, AColorBorder: TColor);
     function IsIndexOk(AIndex: Integer): boolean;
     function IsShowX(AIndex: Integer): boolean;
-    function IsNeedPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
-    function DoAfterPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+    function IsPaintNeeded(AElemType: TATTabElemType;
+      AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+    function DoPaintAfter(AElemType: TATTabElemType;
+      AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
     procedure TabMenuClick(Sender: TObject);
     function GetTabWidth_Plus_Raw: Integer;
     procedure DoUpdateTabWidths;
@@ -494,9 +510,9 @@ procedure TATTabs.DoPaintTabTo(
   ACloseBtn: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
-  PX1, PX2, PX3, PX4, PXX1, PXX2: TPoint;
   RText: TRect;
   NIndentL, NIndentR: Integer;
+  AType: TATTabElemType;
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ARect);
@@ -549,12 +565,6 @@ begin
   DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
   DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
 
-  {
-  //clear corner pixels
-  C.Pixels[PL1.X, PL1.Y]:= FColorBg;
-  C.Pixels[PR1.X, PR1.Y]:= FColorBg;
-  }
-
   //color mark
   if ATabHilite<>clNone then
   begin
@@ -565,35 +575,51 @@ begin
   //"close" button
   if ACloseBtn then
   begin
+    if ATabCloseBg<>clNone then
+      AType:= aeXButtonOver
+    else
+      AType:= aeXButton;
     RText:= GetTabRect_X(ARect);
-    C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
-    C.FillRect(RText);
-    C.Pen.Color:= IfThen(ATabCloseBorder<>clNone, ATabCloseBorder, ATabBg);
-    C.Rectangle(RText);
-    C.Brush.Color:= ATabBg;
-
-    //paint cross by 2 polygons, each has 6 points (3 points at line edge) 
-    C.Brush.Color:= FColorCloseX;
-    C.Pen.Color:= FColorCloseX;
-
-    PXX1:= Point(RText.Left+FTabIndentXInner, RText.Top+FTabIndentXInner);
-    PXX2:= Point(RText.Right-FTabIndentXInner-1, RText.Bottom-FTabIndentXInner-1);
-    PX1:= Point(PXX1.X+1, PXX1.Y);
-    PX2:= Point(PXX1.X, PXX1.Y+1);
-    PX3:= Point(PXX2.X-1, PXX2.Y);
-    PX4:= Point(PXX2.X, PXX2.Y-1);
-    C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
-
-    PXX1:= Point(RText.Right-FTabIndentXInner-1, RText.Top+FTabIndentXInner);
-    PXX2:= Point(RText.Left+FTabIndentXInner, RText.Bottom-FTabIndentXInner-1);
-    PX1:= Point(PXX1.X-1, PXX1.Y);
-    PX2:= Point(PXX1.X, PXX1.Y+1);
-    PX3:= Point(PXX2.X+1, PXX2.Y);
-    PX4:= Point(PXX2.X, PXX2.Y-1);
-    C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
-
-    C.Brush.Color:= ATabBg;
+    if IsPaintNeeded(AType, -1, C, RText) then
+    begin
+      DoPaintXTo(C, RText, ATabBg, ATabCloseBg, ATabCloseBorder);
+      DoPaintAfter(AType, -1, C, RText);
+    end;
   end;
+end;
+
+procedure TATTabs.DoPaintXTo(C: TCanvas; const R: TRect;
+  ATabBg, ATabCloseBg, ATabCloseBorder: TColor);
+var
+  PX1, PX2, PX3, PX4, PXX1, PXX2: TPoint;
+begin
+  C.Brush.Color:= IfThen(ATabCloseBg<>clNone, ATabCloseBg, ATabBg);
+  C.FillRect(R);
+  C.Pen.Color:= IfThen(ATabCloseBorder<>clNone, ATabCloseBorder, ATabBg);
+  C.Rectangle(R);
+  C.Brush.Color:= ATabBg;
+
+  //paint cross by 2 polygons, each has 6 points (3 points at line edge)
+  C.Brush.Color:= FColorCloseX;
+  C.Pen.Color:= FColorCloseX;
+
+  PXX1:= Point(R.Left+FTabIndentXInner, R.Top+FTabIndentXInner);
+  PXX2:= Point(R.Right-FTabIndentXInner-1, R.Bottom-FTabIndentXInner-1);
+  PX1:= Point(PXX1.X+1, PXX1.Y);
+  PX2:= Point(PXX1.X, PXX1.Y+1);
+  PX3:= Point(PXX2.X-1, PXX2.Y);
+  PX4:= Point(PXX2.X, PXX2.Y-1);
+  C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
+
+  PXX1:= Point(R.Right-FTabIndentXInner-1, R.Top+FTabIndentXInner);
+  PXX2:= Point(R.Left+FTabIndentXInner, R.Bottom-FTabIndentXInner-1);
+  PX1:= Point(PXX1.X-1, PXX1.Y);
+  PX2:= Point(PXX1.X, PXX1.Y+1);
+  PX3:= Point(PXX2.X+1, PXX2.Y);
+  PX4:= Point(PXX2.X, PXX2.Y-1);
+  C.Polygon([PX1, PXX1, PX2, PX3, PXX2, PX4]);
+
+  C.Brush.Color:= ATabBg;
 end;
 
 function TATTabs.GetTabWidth_Plus_Raw: Integer;
@@ -683,18 +709,20 @@ begin
     end;
 end;
 
-function TATTabs.IsNeedPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+function TATTabs.IsPaintNeeded(AElemType: TATTabElemType;
+  AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
 begin
   Result:= true;
   if Assigned(FOnTabDrawBefore) then
-    FOnTabDrawBefore(Self, AIndex, ACanvas, ARect, Result);
+    FOnTabDrawBefore(Self, AElemType, AIndex, ACanvas, ARect, Result);
 end;
 
-function TATTabs.DoAfterPaintTab(AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
+function TATTabs.DoPaintAfter(AElemType: TATTabElemType;
+  AIndex: Integer; ACanvas: TCanvas; const ARect: TRect): boolean;
 begin
   Result:= true;
   if Assigned(FOnTabDrawAfter) then
-    FOnTabDrawAfter(Self, AIndex, ACanvas, ARect, Result);
+    FOnTabDrawAfter(Self, AElemType, AIndex, ACanvas, ARect, Result);
 end;
 
 procedure TATTabs.DoPaintTo(C: TCanvas);
@@ -704,6 +732,7 @@ var
   AColorXBg, AColorXBorder: TColor;
   ARect: TRect;
   AArrowLeft, AArrowRight, AArrowDown: TRect;
+  AType: TATTabElemType;
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ClientRect);
@@ -722,7 +751,11 @@ begin
     ARect:= GetTabRect_Plus;
     AColorXBg:= clNone;
     AColorXBorder:= clNone;
-    if IsNeedPaintTab(-1, C, ARect) then
+    if FTabIndexOver=cAtTabPlus then
+      AType:= aeTabPlusOver
+    else
+      AType:= aeTabPlus;
+    if IsPaintNeeded(AType, -1, C, ARect) then
     begin
       DoPaintTabTo(C, ARect,
         FTabShowPlusText,
@@ -734,7 +767,7 @@ begin
         AColorXBorder,
         false
         );
-      DoAfterPaintTab(-1, C, ARect);
+      DoPaintAfter(AType, -1, C, ARect);
     end;    
   end;
 
@@ -744,7 +777,11 @@ begin
     begin
       ARect:= GetTabRect(i);
       GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
-      if IsNeedPaintTab(i, C, ARect) then
+      if i=FTabIndexOver then
+        AType:= aeTabPassiveOver
+      else
+        AType:= aeTabPassive;
+      if IsPaintNeeded(AType, i, C, ARect) then
       begin
         DoPaintTabTo(C, ARect,
           TATTabData(FTabList[i]).TabCaption,
@@ -756,7 +793,7 @@ begin
           AColorXBorder,
           IsShowX(i)
           );
-        DoAfterPaintTab(i, C, ARect);
+        DoPaintAfter(AType, i, C, ARect);
       end;
     end;
 
@@ -766,7 +803,7 @@ begin
   begin
     ARect:= GetTabRect(i);
     GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
-    if IsNeedPaintTab(i, C, ARect) then
+    if IsPaintNeeded(aeTabActive, i, C, ARect) then
     begin
       DoPaintTabTo(C, ARect,
         TATTabData(FTabList[i]).TabCaption,
@@ -778,7 +815,7 @@ begin
         AColorXBorder,
         IsShowX(i)
         );
-      DoAfterPaintTab(i, C, ARect);
+      DoPaintAfter(aeTabActive, i, C, ARect);
     end;  
   end;
 

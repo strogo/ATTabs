@@ -35,9 +35,11 @@ type
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
     procedure TabClose(Sender: TObject; ATabIndex: Integer; var ACanClose: boolean);
-    procedure TabDrawAfter(Sender: TObject; ATabIndex: Integer;
+    procedure TabDrawAfter(Sender: TObject;
+      AType: TATTabElemType; ATabIndex: Integer;
       C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
-    procedure TabDrawBefore(Sender: TObject; ATabIndex: Integer;
+    procedure TabDrawBefore(Sender: TObject;
+      AType: TATTabElemType; ATabIndex: Integer;
       C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
   public
     { Public declarations }
@@ -89,12 +91,12 @@ begin
   t0.TabIndentXSize:= 15;
   t0.TabIndentXInner:= 3;
   t0.TabIndentInit:= 4;
-  t0.TabShowclose:= tbShowActive;
+  //t0.TabShowclose:= tbShowActive;
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
   t0.TabIndentDropI:= 6;
 
-  t0.AddTab(-1, 'Tab');
+  t0.AddTab(-1, 'Owner-draw');
   t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
   t0.AddTab(-1, 'Last');
 
@@ -230,7 +232,8 @@ begin
   chkPlus.Checked:= t.TabShowPlus;
 end;
 
-procedure TForm1.TabDrawAfter(Sender: TObject; ATabIndex: Integer;
+procedure TForm1.TabDrawAfter(Sender: TObject;
+  AType: TATTabElemType; ATabIndex: Integer;
   C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
 begin
   if ATabIndex<0 then Exit;
@@ -240,10 +243,22 @@ begin
   C.TextOut((ARect.Left+ARect.Right) div 2 - 8, ARect.Top, Inttostr(ATabIndex));
 end;
 
-procedure TForm1.TabDrawBefore(Sender: TObject; ATabIndex: Integer;
+procedure TForm1.TabDrawBefore(Sender: TObject;
+  AType: TATTabElemType; ATabIndex: Integer;
   C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
+var
+  NColor: TColor;
 begin
-  ACanDraw:= true; //ATabIndex<>1;
+  if AType in [aeXButton, aeXButtonOver] then
+  begin
+    NColor:= C.Pen.Color;
+    C.Pen.Width:= 2;
+    C.Pen.Color:= IfThen(AType=aeXButton, clBlue, clRed);
+    C.Ellipse(ARect);
+    ACanDraw:= false;
+    C.Pen.Color:= NColor;
+    C.Pen.Width:= 1;
+  end;
 end;
 
 end.
