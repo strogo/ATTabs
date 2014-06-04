@@ -248,16 +248,19 @@ procedure TForm1.TabDrawBefore(Sender: TObject;
   C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
 var
   NColor: TColor;
+  R: TRect;
 begin
   if AType in [aeXButton, aeXButtonOver] then
   begin
     NColor:= C.Pen.Color;
     C.Pen.Width:= 2;
-    C.Pen.Color:= IfThen(AType=aeXButton, clBlue, clRed);
-    C.Ellipse(ARect);
-    ACanDraw:= false;
+    C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clRed);
+    R:= ARect;
+    InflateRect(R, -2, -2);
+    C.Ellipse(R);
     C.Pen.Color:= NColor;
     C.Pen.Width:= 1;
+    ACanDraw:= false;
   end;
 end;
 
