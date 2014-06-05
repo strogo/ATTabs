@@ -255,8 +255,7 @@ begin
     NColor:= C.Pen.Color;
     C.Pen.Width:= 2;
     C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clRed);
-    R:= ARect;
-    InflateRect(R, -2, -2);
+    R:= Rect(ARect.Left+2, ARect.Top+2, ARect.Right-2, ARect.Bottom-2);
     C.Ellipse(R);
     C.Pen.Color:= NColor;
     C.Pen.Width:= 1;
