@@ -161,7 +161,7 @@ type
     function GetTabRect(AIndex: Integer): TRect;
     function GetTabRect_Plus: TRect;
     function GetTabRect_X(const ARect: TRect): TRect;
-    procedure GetArrowRect(var RLeft, RRight, RDown: TRect);
+    procedure GetArrowRect(var RDown: TRect);
     function GetTabAt(X, Y: Integer): Integer;
     function GetTabData(AIndex: Integer): TATTabData;
     function TabCount: Integer;
@@ -730,8 +730,7 @@ var
   i: Integer;
   RBottom: TRect;
   AColorXBg, AColorXBorder: TColor;
-  ARect: TRect;
-  AArrowLeft, AArrowRight, AArrowDown: TRect;
+  ARect, ARectDown: TRect;
   AType: TATTabElemType;
 begin
   C.Brush.Color:= FColorBg;
@@ -820,7 +819,7 @@ begin
   end;
 
   //paint arrows
-  GetArrowRect(AArrowLeft, AArrowRight, AArrowDown);
+  GetArrowRect(ARectDown);
 
   {//not implemented
   if FTabShowScroll then
@@ -834,7 +833,7 @@ begin
 
   if FTabShowMenu then
   begin
-    DoPaintArrowTo(C, triDown, AArrowDown,
+    DoPaintArrowTo(C, triDown, ARectDown,
       IfThen((FTabIndexOver=cAtArrowDown) and not FMouseDrag, FColorArrowOver, FColorArrow), FColorBg);
   end;
 
@@ -866,13 +865,13 @@ function TATTabs.GetTabAt(X, Y: Integer): Integer;
 var
   i: Integer;
   Pnt: TPoint;
-  RLeft, RRight, RDown: TRect;
+  RDown: TRect;
 begin
   Result:= -1;
   Pnt:= Point(X, Y);
 
   //arrows?
-  GetArrowRect(RLeft, RRight, RDown);
+  GetArrowRect(RDown);
 
   {
   if FTabShowScroll then
@@ -1088,23 +1087,6 @@ begin
 end;
 {$endif}
 
-(*
-procedure TATTabs.DoUpdateTabWidth(AIndex: Integer; ANewWidth: Integer = 0);
-var
-  Data: TATTabData;
-begin
-  if IsIndexOk(AIndex) then
-  begin
-    Data:= TATTabData(FTabList[AIndex]);
-    if ANewWidth>0 then
-      Data.TabWidth:= ANewWidth
-    else
-      Data.TabWidth:= GetTabRectWidth(FTabShowClose, false);
-    Invalidate;
-  end;
-end;
-*)
-
 procedure TATTabs.DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
   AColorArr, AColorBg: TColor);
 var
@@ -1136,20 +1118,10 @@ begin
 end;
 
 
-procedure TATTabs.GetArrowRect(var RLeft, RRight, RDown: TRect);
+procedure TATTabs.GetArrowRect(var RDown: TRect);
 begin
-  RLeft.Top:= FTabIndentTop;
-  RLeft.Bottom:= RLeft.Top+FTabHeight;
-  RRight.Top:= RLeft.Top;
-  RRight.Bottom:= RLeft.Bottom;
-  RDown.Top:= RLeft.Top;
-  RDown.Bottom:= RLeft.Bottom;
-
-  RLeft.Left:= FTabIndentArrowLeft;
-  RLeft.Right:= RLeft.Left+FTabIndentArrowSize*4;
-
-  RRight.Left:= RLeft.Right+1;
-  RRight.Right:= RRight.Left+FTabIndentArrowSize*4;
+  RDown.Top:= FTabIndentTop;
+  RDown.Bottom:= RDown.Top+FTabHeight;
 
   RDown.Right:= ClientWidth;
   RDown.Left:= RDown.Right-FTabIndentArrowRight;
@@ -1159,7 +1131,7 @@ procedure TATTabs.ShowTabMenu;
 var
   i: Integer;
   mi: TMenuItem;
-  R1, R2, RDown: TRect;
+  RDown: TRect;
   P: TPoint;
   bShow: boolean;
 begin
@@ -1185,7 +1157,7 @@ begin
     FTabMenu.Items.Add(mi);
   end;
 
-  GetArrowRect(R1, R2, RDown);
+  GetArrowRect(RDown);
   P:= Point(RDown.Left, RDown.Bottom);
   P:= ClientToScreen(P);
   FTabMenu.Popup(P.X, P.Y);
