@@ -95,9 +95,10 @@ begin
   t0.TabShowplus:= false;
   t0.TabShowMenu:= false;
   t0.TabIndentDropI:= 6;
+  t0.TabBottom:= true;
 
-  t0.AddTab(-1, 'Owner-draw');
-  t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+  t0.AddTab(-1, 'Owner-draw', nil, false, clNone);
+  t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);
   t0.AddTab(-1, 'Last');
 
   //-----------------------------------
@@ -240,7 +241,7 @@ begin
   C.Font.Name:= 'Tahoma';
   C.Font.Size:= 8;
   C.Font.Color:= clBlue;
-  C.TextOut((ARect.Left+ARect.Right) div 2 - 8, ARect.Top, Inttostr(ATabIndex));
+  C.TextOut((ARect.Left+ARect.Right) div 2 - 8, ARect.Top+1, Inttostr(ATabIndex));
 end;
 
 procedure TForm1.TabDrawBefore(Sender: TObject;

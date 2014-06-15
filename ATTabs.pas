@@ -85,6 +85,7 @@ type
     FColorArrowOver: TColor; //color of "down" arrow, mouse-over
 
     //spaces
+    FTabBottom: boolean; 
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
     FTabHeight: Integer;
     FTabWidthMin: Integer; //tab minimal width (used when lot of tabs)
@@ -202,6 +203,7 @@ type
     property ColorArrow: TColor read FColorArrow write FColorArrow;
     property ColorArrowOver: TColor read FColorArrowOver write FColorArrowOver;
     //spaces
+    property TabBottom: boolean read FTabBottom write FTabBottom;
     property TabAngle: Integer read FTabAngle write FTabAngle;
     property TabHeight: Integer read FTabHeight write FTabHeight;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
@@ -424,6 +426,7 @@ begin
   FColorArrow:= $999999;
   FColorArrowOver:= $E0E0E0;
 
+  FTabBottom:= false;
   FTabAngle:= 5;
   FTabHeight:= 24;
   FTabWidthMin:= 26;
@@ -513,12 +516,18 @@ var
   RText: TRect;
   NIndentL, NIndentR: Integer;
   AType: TATTabElemType;
+  AInvert: Integer;
 begin
   C.Brush.Color:= FColorBg;
   C.FillRect(ARect);
 
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
+
+  if FTabBottom then
+    AInvert:= -1
+  else
+    AInvert:= 1;
 
   NIndentL:= Max(FTabIndentLeft, FTabAngle);
   NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabIndentXSize div 2);
@@ -527,24 +536,30 @@ begin
   RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
 
   //left triangle
-  PL1:= Point(ARect.Left+FTabAngle, ARect.Top);
-  PL2:= Point(ARect.Left-FTabAngle, ARect.Bottom-1);
+  PL1:= Point(ARect.Left+FTabAngle*AInvert, ARect.Top);
+  PL2:= Point(ARect.Left-FTabAngle*AInvert, ARect.Bottom-1);
   if FTabAngle>0 then
   begin
     //DrawTriangleRaw(C, PL1, PL2, Point(PL1.X, PL2.Y), ATabBg);
     //draw little shifted line- bottom-left point x+=1
-    DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL1.X, PL2.Y), ATabBg);
+    if FTabBottom then
+      DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL2.X, PL1.Y), ATabBg)
+    else
+      DrawTriangleRaw(C, PL1, Point(PL2.X+1, PL2.Y), Point(PL1.X, PL2.Y), ATabBg);
   end;
 
   //right triangle
-  PR1:= Point(ARect.Right-FTabAngle-1, ARect.Top);
-  PR2:= Point(ARect.Right+FTabAngle-1, ARect.Bottom-1);
+  PR1:= Point(ARect.Right-FTabAngle*AInvert-1, ARect.Top);
+  PR2:= Point(ARect.Right+FTabAngle*AInvert-1, ARect.Bottom-1);
   if FTabAngle>0 then
   begin
     //DrawTriangleRaw(C, PR1, PR2, Point(PR1.X, PR2.Y), ATabBg);
     //draw little shifted line- bottom-right point x-=1
-    DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR1.X, PR2.Y), ATabBg);
-  end;  
+    if FTabBottom then
+      DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR2.X, PR1.Y), ATabBg)
+    else
+      DrawTriangleRaw(C, PR1, Point(PR2.X-1, PR2.Y), Point(PR1.X, PR2.Y), ATabBg);
+  end;
 
   //caption
   FBitmapText.Canvas.Brush.Color:= ATabBg;
@@ -562,14 +577,26 @@ begin
   //borders
   DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y+1, ATabBorder);
   DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y+1, ATabBorder);
-  DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
-  DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
+  if FTabBottom then
+  begin
+    DrawAntialisedLine(C, PL2.X, PL2.Y+1, PR2.X, PL2.Y+1, ATabBorder);
+    DrawAntialisedLine(C, PL1.X, ARect.Top, PR1.X+1, ARect.Top, ATabBorderLow)
+  end  
+  else
+  begin
+    DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
+    DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
+  end;
 
   //color mark
   if ATabHilite<>clNone then
   begin
     C.Brush.Color:= ATabHilite;
-    C.FillRect(Rect(PL1.X+1, PL1.Y+1, PR1.X, PR1.Y+1+FTabIndentColor));
+    if FTabBottom then
+      C.FillRect(Rect(PL2.X+1, PL2.Y-2, PR2.X, PR2.Y-2+FTabIndentColor))
+    else
+      C.FillRect(Rect(PL1.X+1, PL1.Y+1, PR1.X, PR1.Y+1+FTabIndentColor));
+    C.Brush.Color:= ATabBg;
   end;
 
   //"close" button
@@ -739,10 +766,20 @@ begin
   DoUpdateTabWidths;
 
   //paint bottom rect
-  RBottom:= Rect(0, FTabIndentTop+FTabHeight, ClientWidth, ClientHeight);
-  C.Brush.Color:= FColorTabActive;
-  C.FillRect(RBottom);
-  DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
+  if not FTabBottom then
+  begin
+    RBottom:= Rect(0, FTabIndentTop+FTabHeight, ClientWidth, ClientHeight);
+    C.Brush.Color:= FColorTabActive;
+    C.FillRect(RBottom);
+    DrawAntialisedLine(C, 0, RBottom.Top, ClientWidth, RBottom.Top, FColorBorderActive);
+  end
+  else
+  begin
+    RBottom:= Rect(0, 0, ClientWidth, FTabIndentTop);
+    C.Brush.Color:= FColorTabActive;
+    C.FillRect(RBottom);
+    DrawAntialisedLine(C, 0, RBottom.Bottom, ClientWidth, RBottom.Bottom, FColorBorderActive);
+  end;
 
   //paint "plus" tab
   if FTabShowPlus then
