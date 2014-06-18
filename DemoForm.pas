@@ -96,6 +96,7 @@ begin
   t0.TabShowMenu:= false;
   t0.TabIndentDropI:= 6;
   t0.TabBottom:= true;
+  t0.TabNumPrefix:= '%d. ';
 
   t0.AddTab(-1, 'Owner-draw', nil, false, clNone);
   t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);

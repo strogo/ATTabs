@@ -85,6 +85,7 @@ type
     FColorArrowOver: TColor; //color of "down" arrow, mouse-over
 
     //spaces
+    FTabNumPrefix: string;
     FTabBottom: boolean; 
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
     FTabHeight: Integer;
@@ -208,6 +209,7 @@ type
     property TabHeight: Integer read FTabHeight write FTabHeight;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
     property TabWidthMax: Integer read FTabWidthMax write FTabWidthMax;
+    property TabNumPrefix: string read FTabNumPrefix write FTabNumPrefix;
     property TabIndentDropI: Integer read FTabIndentDropI write FTabIndentDropI;
     property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
@@ -243,7 +245,8 @@ type
 implementation
 
 uses
-  SysUtils, Forms, Math;
+  SysUtils,
+  Forms, Math;
 
 
 procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: {real}Integer; const LineColor: TColor);
@@ -432,6 +435,7 @@ begin
   FTabWidthMin:= 26;
   FTabWidthMax:= 130;
   FTabWidthHideX:= 55;
+  FTabNumPrefix:= '';
   FTabDragCursor:= crDrag;
   FTabIndentLeft:= 8;
   FTabIndentDropI:= 4;
@@ -820,7 +824,8 @@ begin
       if IsPaintNeeded(AType, i, C, ARect) then
       begin
         DoPaintTabTo(C, ARect,
-          TATTabData(FTabList[i]).TabCaption,
+          Format(FTabNumPrefix, [i+1]) +
+            TATTabData(FTabList[i]).TabCaption,
           IfThen((i=FTabIndexOver) and not FMouseDrag, FColorTabOver, FColorTabPassive),
           FColorBorderPassive,
           FColorBorderActive,
@@ -842,7 +847,8 @@ begin
     if IsPaintNeeded(aeTabActive, i, C, ARect) then
     begin
       DoPaintTabTo(C, ARect,
-        TATTabData(FTabList[i]).TabCaption,
+        Format(FTabNumPrefix, [i+1]) +
+          TATTabData(FTabList[i]).TabCaption,
         FColorTabActive,
         FColorBorderActive,
         IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
