@@ -1078,6 +1078,8 @@ procedure TATTabs.DeleteTab(AIndex: Integer);
 var
   CanClose: boolean;
 begin
+  FMouseDown:= false;
+
   CanClose:= true;
   if Assigned(FOnTabClose) then
     FOnTabClose(Self, AIndex, CanClose);
