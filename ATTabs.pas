@@ -527,16 +527,6 @@ var
   AType: TATTabElemType;
   AInvert: Integer;
 begin
-  {
-  //seems not needed
-  AType:= aeBackground;
-  if IsPaintNeeded(AType, -1, C, ARect) then
-  begin
-    DoPaintBgTo(C, ARect);
-    DoPaintAfter(AType, -1, C, ARect);
-  end;
-  }
-
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
 
