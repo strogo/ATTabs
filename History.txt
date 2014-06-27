@@ -1,0 +1,6 @@
+
+1.0.3
++ support for owner-draw of backgnd (e.g. with SpTbx)
+
+1.0.2
++ support for "bottom tabs" (TabBottom prop)
