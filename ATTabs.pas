@@ -113,6 +113,7 @@ type
     //FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
+    FTabNonEmpty: boolean; //disable zero tabs state (call add-tab on closing last tab)
     FTabDragEnabled: boolean;
     FTabDragCursor: TCursor;
 
@@ -230,6 +231,7 @@ type
     //property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll; //disabled
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
+    property TabNonEmpty: boolean read FTabNonEmpty write FTabNonEmpty;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
     property TabDragCursor: TCursor read FTabDragCursor write FTabDragCursor;
 
@@ -477,6 +479,7 @@ begin
   FTabIndexOver:= -1;
   FTabList:= TList.Create;
   FTabMenu:= nil;
+  FTabNonEmpty:= false;
 
   FOnTabClick:= nil;
   FOnTabPlusClick:= nil;
@@ -1101,6 +1104,10 @@ begin
       SetTabIndex(FTabIndex);
 
     Invalidate;
+
+    if (TabCount=0) and FTabNonEmpty then
+      if Assigned(FOnTabPlusClick) then
+        FOnTabPlusClick(Self);
   end;
 end;
 
