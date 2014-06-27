@@ -93,7 +93,7 @@ begin
   t0.TabIndentInit:= 4;
   //t0.TabShowclose:= tbShowActive;
   t0.TabShowplus:= false;
-  t0.TabShowMenu:= false;
+  //t0.TabShowMenu:= false;
   t0.TabIndentDropI:= 6;
   t0.TabBottom:= true;
   t0.TabNumPrefix:= '%d. ';

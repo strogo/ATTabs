@@ -1156,9 +1156,6 @@ var
   R: TRect;
   N, SizeX, SizeY: Integer;
 begin
-  C.Brush.Color:= AColorBg;
-  C.FillRect(ARect);
-
   N:= FTabIndentArrowSize;
   case ATyp of
     triLeft,
