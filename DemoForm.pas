@@ -252,17 +252,30 @@ var
   NColor: TColor;
   R: TRect;
 begin
-  if AType in [aeXButton, aeXButtonOver] then
-  begin
-    NColor:= C.Pen.Color;
-    C.Pen.Width:= 2;
-    C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clRed);
-    R:= Rect(ARect.Left+2, ARect.Top+2, ARect.Right-2, ARect.Bottom-2);
-    C.Ellipse(R);
-    C.Pen.Color:= NColor;
-    C.Pen.Width:= 1;
-    ACanDraw:= false;
-  end;
+  case AType of
+    aeBackground:
+    begin
+      NColor:= C.Brush.Color;
+      C.Brush.Style:= bsFDiagonal;
+      C.Brush.Color:= clGreen;
+      C.FillRect(ARect);
+      C.Brush.Color:= NColor;
+      C.Brush.Style:= bsSolid;
+      ACanDraw:= false;
+    end;
+    aeXButton,
+    aeXButtonOver:
+    begin
+      NColor:= C.Pen.Color;
+      C.Pen.Width:= 2;
+      C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clRed);
+      R:= Rect(ARect.Left+2, ARect.Top+2, ARect.Right-2, ARect.Bottom-2);
+      C.Ellipse(R);
+      C.Pen.Color:= NColor;
+      C.Pen.Width:= 1;
+      ACanDraw:= false;
+    end;
+  end;  
 end;
 
 end.

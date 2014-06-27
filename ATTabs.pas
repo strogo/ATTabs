@@ -33,6 +33,7 @@ type
 
 type
   TATTabElemType = (
+    aeBackground,
     aeTabActive,
     aeTabPassive,
     aeTabPassiveOver,
@@ -135,6 +136,7 @@ type
     FOnTabDrawAfter: TATTabDrawEvent;
 
     procedure DoPaintTo(C: TCanvas);
+    procedure DoPaintBgTo(C: TCanvas; const ARect: TRect);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: string;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
@@ -525,8 +527,15 @@ var
   AType: TATTabElemType;
   AInvert: Integer;
 begin
-  C.Brush.Color:= FColorBg;
-  C.FillRect(ARect);
+  {
+  //seems not needed
+  AType:= aeBackground;
+  if IsPaintNeeded(AType, -1, C, ARect) then
+  begin
+    DoPaintBgTo(C, ARect);
+    DoPaintAfter(AType, -1, C, ARect);
+  end;
+  }
 
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
@@ -759,6 +768,12 @@ begin
     FOnTabDrawAfter(Self, AElemType, AIndex, ACanvas, ARect, Result);
 end;
 
+procedure TATTabs.DoPaintBgTo(C: TCanvas; const ARect: TRect);
+begin
+  C.Brush.Color:= FColorBg;
+  C.FillRect(ARect);
+end;
+
 procedure TATTabs.DoPaintTo(C: TCanvas);
 var
   i: Integer;
@@ -767,8 +782,13 @@ var
   ARect, ARectDown: TRect;
   AType: TATTabElemType;
 begin
-  C.Brush.Color:= FColorBg;
-  C.FillRect(ClientRect);
+  AType:= aeBackground;
+  ARect:= ClientRect;
+  if IsPaintNeeded(AType, -1, C, ARect) then
+  begin
+    DoPaintBgTo(C, ARect);
+    DoPaintAfter(AType, -1, C, ARect);
+  end;
 
   DoUpdateTabWidths;
 
@@ -866,16 +886,6 @@ begin
 
   //paint arrows
   GetArrowRect(ARectDown);
-
-  {//not implemented
-  if FTabShowScroll then
-  begin
-    DoPaintArrowTo(C, triLeft, AArrowLeft,
-      IfThen(FTabIndexOver=cAtArrowLeft, FColorArrowOver, FColorArrow), FColorBg);
-    DoPaintArrowTo(C, triRight, AArrowRight,
-      IfThen(FTabIndexOver=cAtArrowRight, FColorArrowOver, FColorArrow), FColorBg);
-  end;
-  }
 
   if FTabShowMenu then
   begin
