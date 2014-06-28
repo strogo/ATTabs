@@ -1,6 +1,7 @@
 
 1.0.3
-+ support for owner-draw of backgnd (e.g. with SpTbx)
++ event OnTabEmpty (last tab closed)
++ support for owner-draw of backgnd (e.g. with SpTbx theme)
 
 1.0.2
 + support for "bottom tabs" (TabBottom prop)
