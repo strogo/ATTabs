@@ -177,7 +177,7 @@ type
       AObject: TObject = nil;
       AModified: boolean = false;
       AColor: TColor = clNone);
-    procedure DeleteTab(AIndex: Integer);
+    procedure DeleteTab(AIndex: Integer; AAllowEvent: boolean = true);
     procedure ShowTabMenu;
   protected
     procedure Paint; override;
@@ -1076,16 +1076,19 @@ begin
   Invalidate;
 end;
 
-procedure TATTabs.DeleteTab(AIndex: Integer);
+procedure TATTabs.DeleteTab(AIndex: Integer; AAllowEvent: boolean = true);
 var
   CanClose: boolean;
 begin
   FMouseDown:= false;
 
-  CanClose:= true;
-  if Assigned(FOnTabClose) then
-    FOnTabClose(Self, AIndex, CanClose);
-  if not CanClose then Exit;  
+  if AAllowEvent then
+  begin
+    CanClose:= true;
+    if Assigned(FOnTabClose) then
+      FOnTabClose(Self, AIndex, CanClose);
+    if not CanClose then Exit;
+  end;  
 
   if IsIndexOk(AIndex) then
   begin
