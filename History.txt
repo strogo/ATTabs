@@ -1,5 +1,7 @@
 
-1.0.3
+1.0.5
++ drag-drop of tabs works between all ATTabs controls, even no events needed
++ parameter added in DeleteTab
 + event OnTabEmpty (last tab closed)
 + support for owner-draw of backgnd (e.g. with SpTbx theme)
 

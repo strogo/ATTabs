@@ -159,6 +159,7 @@ type
     function GetTabWidth_Plus_Raw: Integer;
     procedure DoUpdateTabWidths;
     procedure DoTabDrop;
+    procedure DoTabDropToOtherControl(ATabs: TATTabs; const APnt: TPoint);
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
@@ -249,9 +250,12 @@ type
 implementation
 
 uses
-  SysUtils,
-  Forms, Math;
+  SysUtils, Dialogs, Forms, Math;
 
+function PtInControl(Control: TControl; const ScreenPnt: TPoint): boolean;
+begin
+  Result:= PtInRect(Control.BoundsRect, Control.ScreenToClient(ScreenPnt));
+end;
 
 procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: {real}Integer; const LineColor: TColor);
 // http://stackoverflow.com/a/3613953/1789574
@@ -959,6 +963,9 @@ begin
 end;
 
 procedure TATTabs.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  Pnt: TPoint;
+  Ctl: TWinControl;
 begin
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
@@ -967,7 +974,17 @@ begin
   begin
     FMouseDrag:= false;
     Screen.Cursor:= crDefault;
-    DoTabDrop;
+
+    //find drag-drop target: is it Self or other ATTabs?
+    Pnt:= ClientToScreen(Point(X, Y));
+    if PtInControl(Self, Pnt) then
+      DoTabDrop
+    else
+    begin
+      Ctl:= FindVCLWindow(Pnt);
+      if (Ctl<>nil) and (Ctl is TATTabs) and (Ctl as TATTabs).TabDragEnabled then
+        DoTabDropToOtherControl(Ctl as TATTabs, Ctl.ScreenToClient(Pnt));
+    end;
   end;
 end;
 
@@ -1023,18 +1040,32 @@ end;
 procedure TATTabs.MouseMove(Shift: TShiftState; X, Y: Integer);
 const
   cDragMin = 10; //mouse must move by NN pixels to start drag
+var
+  Pnt: TPoint;
+  Ctl: TWinControl;
 begin
   inherited;
   FTabIndexOver:= GetTabAt(X, Y);
   FTabIndexDrop:= FTabIndexOver;
 
-  if FMouseDown and FTabDragEnabled and (TabCount>1) then
+  if FMouseDown and FTabDragEnabled then
   begin
     if (Abs(X-FMouseDownPnt.X)>cDragMin) or
        (Abs(Y-FMouseDownPnt.Y)>cDragMin) then
     begin
       FMouseDrag:= true;
-      Screen.Cursor:= FTabDragCursor;
+
+      //update mouse cursor: indicate drop allowed
+      Pnt:= ClientToScreen(Point(X, Y));
+      Screen.Cursor:= crNoDrop;
+      if PtInControl(Self, Pnt) then
+        Screen.Cursor:= FTabDragCursor
+      else
+      begin
+        Ctl:= FindVCLWindow(Pnt);
+        if (Ctl<>nil) and (Ctl is TATTabs) and ((Ctl as TATTabs).TabDragEnabled) then
+          Screen.Cursor:= FTabDragCursor
+      end;
     end;
   end;
 
@@ -1279,6 +1310,35 @@ begin
   Invalidate;
 end;
 {$endif}
+
+procedure TATTabs.DoTabDropToOtherControl(ATabs: TATTabs;
+  const APnt: TPoint);
+var
+  NTab, NTabTo: Integer;
+  Data: TATTabData;
+begin
+  NTab:= FTabIndex;
+  NTabTo:= ATabs.GetTabAt(APnt.X, APnt.Y); //-1 is allowed
+
+  Data:= GetTabData(NTab);
+  if Data=nil then Exit;
+
+  ATabs.AddTab(NTabTo, Data.TabCaption, Data.TabObject, Data.TabModified, Data.TabColor);
+
+  //correct TabObject parent
+  if Data.TabObject is TWinControl then
+    if (Data.TabObject as TWinControl).Parent = Self.Parent then
+      (Data.TabObject as TWinControl).Parent:= ATabs.Parent;
+
+  //activate dropped tab
+  if NTabTo<0 then
+    ATabs.TabIndex:= ATabs.TabCount-1
+  else
+    ATabs.TabIndex:= NTabTo;  
+
+  //delete old tab (don't call OnTabClose)
+  DeleteTab(NTab, false{AllowEvent});
+end;
 
 end.
 
