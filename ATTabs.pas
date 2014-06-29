@@ -253,6 +253,15 @@ implementation
 uses
   SysUtils, Dialogs, Forms, Math;
 
+function _FindControl(Pnt: TPoint): TControl;
+begin
+  {$ifdef FPC}
+  Result:= FindControlAtPosition(Pnt, false);
+  {$else}
+  Result:= FindVCLWindow(Pnt);
+  {$endif}
+end;
+
 function PtInControl(Control: TControl; const ScreenPnt: TPoint): boolean;
 begin
   Result:= PtInRect(Control.BoundsRect, Control.ScreenToClient(ScreenPnt));
@@ -980,7 +989,7 @@ end;
 procedure TATTabs.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   Pnt: TPoint;
-  Ctl: TWinControl;
+  Ctl: TControl;
 begin
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
@@ -997,7 +1006,7 @@ begin
     else
     if FTabDragOutEnabled then
     begin
-      Ctl:= FindVCLWindow(Pnt);
+      Ctl:= _FindControl(Pnt);
       if Ctl<>nil then
         DoTabDropToOtherControl(Ctl, Ctl.ScreenToClient(Pnt));
     end;
@@ -1082,7 +1091,7 @@ begin
       else
       if FTabDragOutEnabled then
       begin
-        Ctl:= FindVCLWindow(Pnt);
+        Ctl:= _FindControl(Pnt);
         if Ctl<>nil then
         begin
           if (Ctl is TATTabs) and (Ctl as TATTabs).TabDragEnabled then
