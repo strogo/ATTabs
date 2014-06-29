@@ -111,7 +111,6 @@ type
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: string; //text of "plus" tab
-    //FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabDragEnabled: boolean; //enable drag-drop
@@ -305,9 +304,17 @@ begin
   if (AX1 = AX2) or (AY1 = AY2) then
   begin
     Canvas.Pen.Width:= 1;
-    Canvas.Pen.Color := LineColor;
-    Canvas.MoveTo(AX1, AY1);
-    Canvas.LineTo(AX2, AY2);
+    Canvas.Pen.Color:= LineColor;
+    if (AX1 = AX2) then
+    begin
+      Canvas.MoveTo(AX1, AY1);
+      Canvas.LineTo(AX2, AY2+1);
+    end
+    else
+    begin
+      Canvas.MoveTo(AX1, AY1);
+      Canvas.LineTo(AX2+1, AY2);
+    end;
     Exit
   end;
 
@@ -586,17 +593,23 @@ begin
     Rect(0, 0, RText.Right-RText.Left, RText.Bottom-RText.Top));
 
   //borders
-  DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y+1, ATabBorder);
-  DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y+1, ATabBorder);
   if FTabBottom then
   begin
+    DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y+1, ATabBorder);
+    DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y+1, ATabBorder);
     DrawAntialisedLine(C, PL2.X, PL2.Y+1, PR2.X, PL2.Y+1, ATabBorder);
-    DrawAntialisedLine(C, PL1.X, ARect.Top, PR1.X+1, ARect.Top, ATabBorderLow)
-  end  
+    if ATabBorderLow<>clNone then
+      DrawAntialisedLine(C, PL1.X, ARect.Top, PR1.X, ARect.Top, ATabBorderLow)
+  end
   else
   begin
+    DrawAntialisedLine(C, PL1.X, PL1.Y, PL2.X, PL2.Y+1, ATabBorder);
+    DrawAntialisedLine(C, PR1.X, PR1.Y, PR2.X, PR2.Y+1, ATabBorder);
     DrawAntialisedLine(C, PL1.X, PL1.Y, PR1.X, PL1.Y, ATabBorder);
-    DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X+1, ARect.Bottom, ATabBorderLow);
+    if ATabBorderLow<>clNone then
+      DrawAntialisedLine(C, PL2.X, ARect.Bottom, PR2.X, ARect.Bottom, ATabBorderLow)
+    else
+      DrawAntialisedLine(C, PL2.X+1, ARect.Bottom, PR2.X-1, ARect.Bottom, ATabBg);
   end;
 
   //color mark
@@ -869,7 +882,7 @@ begin
           TATTabData(FTabList[i]).TabCaption,
         FColorTabActive,
         FColorBorderActive,
-        IfThen(FTabShowBorderActiveLow, FColorBorderActive, FColorTabActive),
+        IfThen(FTabShowBorderActiveLow, FColorBorderActive, clNone),
         TATTabData(FTabList[i]).TabColor,
         AColorXBg,
         AColorXBorder,

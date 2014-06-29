@@ -59,6 +59,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   //default tabs
   t:= TATTabs.Create(Self);
+  //t.TabAngle:= 0; /////////test
   t.Parent:= Self;
   t.Align:= alTop;
   t.OnTabClick:=     {$ifdef FPC}@{$endif} TabClick;
@@ -109,7 +110,7 @@ begin
   t0.Align:= alBottom;
 
   t0.Height:= 42;
-  t0.TabShowBorderActiveLow:= true;
+  //t0.TabShowBorderActiveLow:= true;
   t0.TabIndentInit:= 2;
   t0.TabIndentTop:= 4;
   t0.TabIndentXSize:= 13;
