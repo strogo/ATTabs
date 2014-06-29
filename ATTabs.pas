@@ -1071,7 +1071,7 @@ begin
           if (Ctl is TATTabs) and (Ctl as TATTabs).TabDragEnabled then
             Screen.Cursor:= FTabDragCursor
           else
-          if TControl2(Ctl).DragMode=dmAutomatic then
+          if Assigned(TControl2(Ctl).OnDragDrop) then
             Screen.Cursor:= FTabDragCursor;
         end;
       end;
@@ -1328,12 +1328,16 @@ var
   P: TPoint;
 begin
   if not (ATarget is TATTabs) then
-    if TControl2(ATarget).DragMode=dmAutomatic then
+  begin
+    if Assigned(TControl2(ATarget).OnDragDrop) then
     begin
       P:= APnt;
-      TControl2(ATarget).OnDragDrop(Self, GetTabData(FTabIndex), P.X, P.Y);
-      Exit;
+      Data:= GetTabData(FTabIndex);
+      if Data<>nil then
+        TControl2(ATarget).OnDragDrop(ATarget, Data.TabObject, P.X, P.Y);
     end;
+    Exit;
+  end;  
 
   ATabs:= ATarget as TATTabs;
   if not ATabs.TabDragEnabled then Exit;
