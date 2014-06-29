@@ -159,7 +159,7 @@ type
     function GetTabWidth_Plus_Raw: Integer;
     procedure DoUpdateTabWidths;
     procedure DoTabDrop;
-    procedure DoTabDropToOtherControl(ATabs: TATTabs; const APnt: TPoint);
+    procedure DoTabDropToOtherControl(ATarget: TControl; const APnt: TPoint);
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
@@ -982,8 +982,8 @@ begin
     else
     begin
       Ctl:= FindVCLWindow(Pnt);
-      if (Ctl<>nil) and (Ctl is TATTabs) and (Ctl as TATTabs).TabDragEnabled then
-        DoTabDropToOtherControl(Ctl as TATTabs, Ctl.ScreenToClient(Pnt));
+      if Ctl<>nil then
+        DoTabDropToOtherControl(Ctl, Ctl.ScreenToClient(Pnt));
     end;
   end;
 end;
@@ -1037,12 +1037,15 @@ begin
   end;
 end;
 
+type
+  TControl2 = class(TControl);
+
 procedure TATTabs.MouseMove(Shift: TShiftState; X, Y: Integer);
 const
   cDragMin = 10; //mouse must move by NN pixels to start drag
 var
   Pnt: TPoint;
-  Ctl: TWinControl;
+  Ctl: TControl;
 begin
   inherited;
   FTabIndexOver:= GetTabAt(X, Y);
@@ -1063,8 +1066,14 @@ begin
       else
       begin
         Ctl:= FindVCLWindow(Pnt);
-        if (Ctl<>nil) and (Ctl is TATTabs) and ((Ctl as TATTabs).TabDragEnabled) then
-          Screen.Cursor:= FTabDragCursor
+        if Ctl<>nil then
+        begin
+          if (Ctl is TATTabs) and (Ctl as TATTabs).TabDragEnabled then
+            Screen.Cursor:= FTabDragCursor
+          else
+          if TControl2(Ctl).DragMode=dmAutomatic then
+            Screen.Cursor:= FTabDragCursor;
+        end;
       end;
     end;
   end;
@@ -1311,12 +1320,24 @@ begin
 end;
 {$endif}
 
-procedure TATTabs.DoTabDropToOtherControl(ATabs: TATTabs;
-  const APnt: TPoint);
+procedure TATTabs.DoTabDropToOtherControl(ATarget: TControl; const APnt: TPoint);
 var
+  ATabs: TATTabs;
   NTab, NTabTo: Integer;
   Data: TATTabData;
+  P: TPoint;
 begin
+  if not (ATarget is TATTabs) then
+    if TControl2(ATarget).DragMode=dmAutomatic then
+    begin
+      P:= APnt;
+      TControl2(ATarget).OnDragDrop(Self, GetTabData(FTabIndex), P.X, P.Y);
+      Exit;
+    end;
+
+  ATabs:= ATarget as TATTabs;
+  if not ATabs.TabDragEnabled then Exit;
+
   NTab:= FTabIndex;
   NTabTo:= ATabs.GetTabAt(APnt.X, APnt.Y); //-1 is allowed
 
