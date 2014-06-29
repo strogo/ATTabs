@@ -114,7 +114,8 @@ type
     //FTabShowScroll: boolean; //show scroll arrows (not implemented)
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
-    FTabDragEnabled: boolean;
+    FTabDragEnabled: boolean; //enable drag-drop
+    FTabDragOutEnabled: boolean; //also enable drag-drop to another controls
     FTabDragCursor: TCursor;
 
     //otherrs
@@ -235,6 +236,7 @@ type
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
+    property TabDragOutEnabled: boolean read FTabDragOutEnabled write FTabDragOutEnabled;
     property TabDragCursor: TCursor read FTabDragCursor write FTabDragCursor;
 
     //events
@@ -462,10 +464,10 @@ begin
   FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
   FTabShowPlusText:= '+';
-  //FTabShowScroll:= false;
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabDragEnabled:= true;
+  FTabDragOutEnabled:= true;
 
   FBitmap:= TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -980,6 +982,7 @@ begin
     if PtInControl(Self, Pnt) then
       DoTabDrop
     else
+    if FTabDragOutEnabled then
     begin
       Ctl:= FindVCLWindow(Pnt);
       if Ctl<>nil then
@@ -1064,6 +1067,7 @@ begin
       if PtInControl(Self, Pnt) then
         Screen.Cursor:= FTabDragCursor
       else
+      if FTabDragOutEnabled then
       begin
         Ctl:= FindVCLWindow(Pnt);
         if Ctl<>nil then
