@@ -911,7 +911,10 @@ begin
 
   //paint drop mark
   if FMouseDrag then
-    DoPaintDropMark(C);
+  begin
+    if PtInControl(Self, Mouse.CursorPos) then
+      DoPaintDropMark(C);
+  end;
 end;
 
 procedure TATTabs.DoPaintDropMark(C: TCanvas);
@@ -1384,8 +1387,6 @@ end;
 procedure TATTabs.CMMouseLeave(var Msg: TMessage);
 begin
   inherited;
-
-  FMouseDown:= false;
   FTabIndexOver:= -1;
   Invalidate;
 end;
