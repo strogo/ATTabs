@@ -18,6 +18,7 @@ uses
   {$endif}
   {$ifdef FPC}
   LCLIntf,
+  LMessages,
   {$endif}
   Classes, Types, Graphics,
   Controls, ExtCtrls, Menus;
@@ -186,9 +187,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
-    {$ifdef fpc}
-    procedure MouseLeave; override;
-    {$endif}
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
@@ -1337,15 +1336,6 @@ begin
   SetTabIndex(NTo);
 end;
 
-{$ifdef fpc}
-procedure TATTabs.MouseLeave;
-begin
-  inherited;
-  FTabIndexOver:= -1;
-  Invalidate;
-end;
-{$endif}
-
 procedure TATTabs.DoTabDropToOtherControl(ATarget: TControl; const APnt: TPoint);
 var
   ATabs: TATTabs;
@@ -1389,6 +1379,15 @@ begin
 
   //delete old tab (don't call OnTabClose)
   DeleteTab(NTab, false{AllowEvent});
+end;
+
+procedure TATTabs.CMMouseLeave(var Msg: TMessage);
+begin
+  inherited;
+
+  FMouseDown:= false;
+  FTabIndexOver:= -1;
+  Invalidate;
 end;
 
 end.
