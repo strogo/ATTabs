@@ -1,5 +1,9 @@
 unit DemoForm;
 
+{$ifdef fpc}
+  {$mode delphi}
+{$endif}
+  
 interface
 
 uses
@@ -66,9 +70,9 @@ begin
   //t.TabAngle:= 0; /////////test
   t.Parent:= Self;
   t.Align:= alTop;
-  t.OnTabClick:=     {$ifdef FPC}@{$endif} TabClick;
-  t.OnTabPlusClick:= {$ifdef FPC}@{$endif} TabPlusClick;
-  t.OnTabClose:=     {$ifdef FPC}@{$endif} TabClose;
+  t.OnTabClick:= TabClick;
+  t.OnTabPlusClick:= TabPlusClick;
+  t.OnTabClose:= TabClose;
 
   t.AddTab(-1, 'Tab');
   t.AddTab(-1, 'Tab middle len', nil, false, clGreen);
@@ -86,8 +90,8 @@ begin
   t1.Align:= alBottom;
   t1.Font.Size:= 12;
   t1.Height:= 56;
-  t1.OnTabDrawBefore:= {$ifdef FPC}@{$endif} TabDrawBefore;
-  t1.OnTabDrawAfter:= {$ifdef FPC}@{$endif} TabDrawAfter;
+  t1.OnTabDrawBefore:= TabDrawBefore;
+  t1.OnTabDrawAfter:= TabDrawAfter;
   t1.ColorBg:= $F9EADB;
 
   t1.TabHeight:= 30;
