@@ -19,6 +19,8 @@ type
     Edit1: TEdit;
     chkX: TCheckBox;
     chkPlus: TCheckBox;
+    Label1: TLabel;
+    chkNums: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
@@ -29,6 +31,7 @@ type
     procedure chkXClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure chkPlusClick(Sender: TObject);
+    procedure chkNumsClick(Sender: TObject);
   private
     { Private declarations }
     LockEdit: boolean;
@@ -43,7 +46,7 @@ type
       C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
   public
     { Public declarations }
-    t, t0: TATTabs;
+    t, t0, t1: TATTabs;
   end;
 
 var
@@ -51,7 +54,8 @@ var
 
 implementation
 
-uses Math;
+uses
+  Math, StrUtils;
 
 {$R *.dfm}
 
@@ -77,31 +81,30 @@ begin
 
   //-----------------------------------
   //angle tabs below
-  t0:= TATTabs.Create(Self);
-  t0.Parent:= Self;
-  t0.Align:= alBottom;
-  t0.Font.Size:= 12;
-  t0.Height:= 56;
-  t0.OnTabDrawBefore:= {$ifdef FPC}@{$endif} TabDrawBefore;
-  t0.OnTabDrawAfter:= {$ifdef FPC}@{$endif} TabDrawAfter;
-  t0.ColorBg:= $F9EADB;
+  t1:= TATTabs.Create(Self);
+  t1.Parent:= Self;
+  t1.Align:= alBottom;
+  t1.Font.Size:= 12;
+  t1.Height:= 56;
+  t1.OnTabDrawBefore:= {$ifdef FPC}@{$endif} TabDrawBefore;
+  t1.OnTabDrawAfter:= {$ifdef FPC}@{$endif} TabDrawAfter;
+  t1.ColorBg:= $F9EADB;
 
-  t0.TabHeight:= 30;
-  t0.TabWidthMax:= 170;
-  t0.TabIndentTop:= 20;
-  t0.TabIndentXSize:= 15;
-  t0.TabIndentXInner:= 3;
-  t0.TabIndentInit:= 4;
-  //t0.TabShowclose:= tbShowActive;
-  t0.TabShowplus:= false;
-  //t0.TabShowMenu:= false;
-  t0.TabIndentDropI:= 6;
-  t0.TabBottom:= true;
-  t0.TabNumPrefix:= '%d. ';
+  t1.TabHeight:= 30;
+  t1.TabWidthMax:= 170;
+  t1.TabIndentTop:= 20;
+  t1.TabIndentXSize:= 15;
+  t1.TabIndentXInner:= 3;
+  t1.TabIndentInit:= 4;
+  //t1.TabShowclose:= tbShowActive;
+  t1.TabShowplus:= false;
+  //t1.TabShowMenu:= false;
+  t1.TabIndentDropI:= 6;
+  t1.TabBottom:= true;
 
-  t0.AddTab(-1, 'Owner-draw', nil, false, clNone);
-  t0.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);
-  t0.AddTab(-1, 'Last');
+  t1.AddTab(-1, 'Owner-draw', nil, false, clNone);
+  t1.AddTab(-1, 'Tab wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', nil, false, clGreen);
+  t1.AddTab(-1, 'Last');
 
   //-----------------------------------
   //Firefox rectangle tabs
@@ -254,29 +257,37 @@ var
   R: TRect;
 begin
   case AType of
+    {
     aeBackground:
     begin
       NColor:= C.Brush.Color;
-      C.Brush.Style:= bsFDiagonal;
-      C.Brush.Color:= clGreen;
+      //C.Brush.Style:= bsFDiagonal;
+      C.Brush.Color:= clNavy;
       C.FillRect(ARect);
       C.Brush.Color:= NColor;
       C.Brush.Style:= bsSolid;
       ACanDraw:= false;
     end;
+    }
     aeXButton,
     aeXButtonOver:
     begin
       NColor:= C.Pen.Color;
       C.Pen.Width:= 2;
-      C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clRed);
+      C.Pen.Color:= IfThen(AType=aeXButton, clLtGray, clNavy);
       R:= Rect(ARect.Left+2, ARect.Top+2, ARect.Right-2, ARect.Bottom-2);
-      C.Ellipse(R);
+      C.Rectangle(R);
       C.Pen.Color:= NColor;
       C.Pen.Width:= 1;
       ACanDraw:= false;
     end;
   end;  
+end;
+
+procedure TForm1.chkNumsClick(Sender: TObject);
+begin
+  t1.TabNumPrefix:= IfThen(chkNums.Checked, '%d. ', '');
+  t1.Invalidate;
 end;
 
 end.

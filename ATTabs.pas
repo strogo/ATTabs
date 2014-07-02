@@ -6,11 +6,13 @@ License: MPL 2.0
 
 unit ATTabs;
 
-interface
-
-{$ifndef FPC}
-{$define windows}
+{$ifdef FPC}
+  {$mode delphi}
+{$else}
+  {$define windows}
 {$endif}
+
+interface
 
 uses
   {$ifdef windows}
@@ -263,7 +265,7 @@ end;
 
 function PtInControl(Control: TControl; const ScreenPnt: TPoint): boolean;
 begin
-  Result:= PtInRect(Control.BoundsRect, Control.ScreenToClient(ScreenPnt));
+  Result:= PtInRect(Control.ClientRect, Control.ScreenToClient(ScreenPnt));
 end;
 
 procedure DrawAntialisedLine(Canvas: TCanvas; const AX1, AY1, AX2, AY2: {real}Integer; const LineColor: TColor);
@@ -1270,7 +1272,7 @@ begin
     mi:= TMenuItem.Create(Self);
     mi.Tag:= i;
     mi.Caption:= TATTabData(FTabList[i]).TabCaption;
-    mi.OnClick:= {$ifdef FPC}@{$endif}TabMenuClick;
+    mi.OnClick:= TabMenuClick;
     mi.RadioItem:= true;
     mi.Checked:= i=FTabIndex;
     FTabMenu.Items.Add(mi);

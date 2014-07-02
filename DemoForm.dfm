@@ -16,9 +16,16 @@ object Form1: TForm1
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object Label1: TLabel
+    Left = 144
+    Top = 240
+    Width = 261
+    Height = 13
+    Caption = 'Note: enabled drag-drop from top tabs to bottom tabs'
+  end
   object bAdd: TButton
-    Left = 160
-    Top = 192
+    Left = 144
+    Top = 144
     Width = 115
     Height = 25
     Caption = 'add after current'
@@ -26,8 +33,8 @@ object Form1: TForm1
     OnClick = bAddClick
   end
   object bDel: TButton
-    Left = 280
-    Top = 192
+    Left = 264
+    Top = 144
     Width = 75
     Height = 25
     Caption = 'del'
@@ -35,8 +42,8 @@ object Form1: TForm1
     OnClick = bDelClick
   end
   object bColor: TButton
-    Left = 360
-    Top = 192
+    Left = 344
+    Top = 144
     Width = 75
     Height = 25
     Caption = 'color'
@@ -44,8 +51,8 @@ object Form1: TForm1
     OnClick = bColorClick
   end
   object bLeft: TButton
-    Left = 288
-    Top = 224
+    Left = 264
+    Top = 176
     Width = 75
     Height = 25
     Caption = '<'
@@ -53,8 +60,8 @@ object Form1: TForm1
     OnClick = bLeftClick
   end
   object bRt: TButton
-    Left = 368
-    Top = 224
+    Left = 344
+    Top = 176
     Width = 75
     Height = 25
     Caption = '>'
@@ -62,29 +69,38 @@ object Form1: TForm1
     OnClick = bRtClick
   end
   object Edit1: TEdit
-    Left = 288
-    Top = 256
+    Left = 264
+    Top = 208
     Width = 225
     Height = 21
     TabOrder = 5
     OnChange = Edit1Change
   end
   object chkX: TCheckBox
-    Left = 200
-    Top = 152
-    Width = 97
+    Left = 144
+    Top = 88
+    Width = 161
     Height = 17
     Caption = '"x" buttons'
     TabOrder = 6
     OnClick = chkXClick
   end
   object chkPlus: TCheckBox
-    Left = 200
-    Top = 168
-    Width = 97
+    Left = 144
+    Top = 104
+    Width = 169
     Height = 17
     Caption = '"+" tab'
     TabOrder = 7
     OnClick = chkPlusClick
+  end
+  object chkNums: TCheckBox
+    Left = 144
+    Top = 120
+    Width = 185
+    Height = 17
+    Caption = 'numbers on bottom'
+    TabOrder = 8
+    OnClick = chkNumsClick
   end
 end
