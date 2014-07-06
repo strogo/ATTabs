@@ -48,7 +48,7 @@ type
 
 type
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
-    var ACanClose: boolean) of object;
+    var ACanClose, ACanContinue: boolean) of object;
   TATTabMenuEvent = procedure (Sender: TObject;
     var ACanShow: boolean) of object;
   TATTabDrawEvent = procedure (Sender: TObject;
@@ -181,7 +181,7 @@ type
       AObject: TObject = nil;
       AModified: boolean = false;
       AColor: TColor = clNone);
-    procedure DeleteTab(AIndex: Integer; AAllowEvent: boolean = true);
+    function DeleteTab(AIndex: Integer; AAllowEvent, AWithCancelBtn: boolean): boolean;
     procedure ShowTabMenu;
   protected
     procedure Paint; override;
@@ -1056,7 +1056,7 @@ begin
             R:= GetTabRect_X(R);
             if PtInRect(R, Point(X, Y)) then
             begin
-              DeleteTab(FTabIndexOver);
+              DeleteTab(FTabIndexOver, true, false);
               Exit
             end;
           end;
@@ -1146,19 +1146,25 @@ begin
   Invalidate;
 end;
 
-procedure TATTabs.DeleteTab(AIndex: Integer; AAllowEvent: boolean = true);
+function TATTabs.DeleteTab(AIndex: Integer; AAllowEvent, AWithCancelBtn: boolean): boolean;
 var
-  CanClose: boolean;
+  CanClose, CanContinue: boolean;
 begin
   FMouseDown:= false;
 
   if AAllowEvent then
   begin
     CanClose:= true;
+    CanContinue:= AWithCancelBtn;
+
     if Assigned(FOnTabClose) then
-      FOnTabClose(Self, AIndex, CanClose);
-    if not CanClose then Exit;
-  end;  
+      FOnTabClose(Self, AIndex, CanClose, CanContinue);
+
+    if AWithCancelBtn and not CanContinue then
+      begin Result:= false; Exit end;
+    if not CanClose then
+      begin Result:= true; Exit end;
+  end;
 
   if IsIndexOk(AIndex) then
   begin
@@ -1181,6 +1187,8 @@ begin
       if Assigned(FOnTabEmpty) then
         FOnTabEmpty(Self);
   end;
+
+  Result:= true;
 end;
 
 procedure TATTabs.SetTabIndex(AIndex: Integer);
@@ -1383,7 +1391,7 @@ begin
     ATabs.TabIndex:= NTabTo;  
 
   //delete old tab (don't call OnTabClose)
-  DeleteTab(NTab, false{AllowEvent});
+  DeleteTab(NTab, false{AllowEvent}, false);
 end;
 
 procedure TATTabs.CMMouseLeave(var Msg: TMessage);
