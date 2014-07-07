@@ -183,6 +183,7 @@ type
       AColor: TColor = clNone);
     function DeleteTab(AIndex: Integer; AAllowEvent, AWithCancelBtn: boolean): boolean;
     procedure ShowTabMenu;
+    procedure SwitchTab(ANext: boolean);
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -1399,6 +1400,25 @@ begin
   inherited;
   FTabIndexOver:= -1;
   Invalidate;
+end;
+
+procedure TATTabs.SwitchTab(ANext: boolean);
+begin
+  if TabCount>1 then
+    if ANext then
+    begin
+      if TabIndex=TabCount-1 then
+        TabIndex:= 0
+      else
+        TabIndex:= TabIndex+1;
+    end
+    else
+    begin
+      if TabIndex=0 then
+        TabIndex:= TabCount-1
+      else
+        TabIndex:= TabIndex-1;
+    end;
 end;
 
 end.
