@@ -1,8 +1,9 @@
 
-1.0.5
+1.1.0
 + drag-drop of tabs works between all ATTabs controls, even no events needed
++ method SwitchTab
 + prop TabDragOutEnabled
-+ event OnTabEmpty (last tab closed)
++ event OnTabEmpty
 + parameter in DeleteTab
 + support for owner-draw of backgnd (e.g. with SpTbx theme)
 
