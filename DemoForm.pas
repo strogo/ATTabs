@@ -41,7 +41,8 @@ type
     LockEdit: boolean;
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
-    procedure TabClose(Sender: TObject; ATabIndex: Integer; var ACanClose: boolean);
+    procedure TabClose(Sender: TObject; ATabIndex: Integer;
+      var ACanClose, ACanContinie: boolean);
     procedure TabDrawAfter(Sender: TObject;
       AType: TATTabElemType; ATabIndex: Integer;
       C: TCanvas; const ARect: TRect; var ACanDraw: boolean);
@@ -151,7 +152,7 @@ end;
 
 procedure TForm1.bDelClick(Sender: TObject);
 begin
-  t.DeleteTab(1);
+  t.DeleteTab(1, true, false);
 end;
 
 procedure TForm1.bColorClick(Sender: TObject);
@@ -193,7 +194,7 @@ end;
 
 
 procedure TForm1.TabClose(Sender: TObject; ATabIndex: Integer;
-  var ACanClose: boolean);
+  var ACanClose, ACanContinie: boolean);
 {
 var
   d: TATTabData;

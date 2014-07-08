@@ -10,6 +10,9 @@ unit ATTabs;
   {$mode delphi}
 {$else}
   {$define windows}
+  {$ifdef VER150} //Delphi 7
+    {$define WIDE}
+  {$endif}
 {$endif}
 
 interface
@@ -26,9 +29,12 @@ uses
   Controls, ExtCtrls, Menus;
 
 type
+  atString = {$ifdef WIDE} WideString {$else} string {$endif};
+
+type
   TATTabData = class
   public
-    TabCaption: string;
+    TabCaption: atString;
     TabObject: TObject;
     TabColor: TColor;
     TabModified: boolean;
@@ -89,7 +95,7 @@ type
     FColorArrowOver: TColor; //color of "down" arrow, mouse-over
 
     //spaces
-    FTabNumPrefix: string;
+    FTabNumPrefix: atString;
     FTabBottom: boolean; 
     FTabAngle: Integer; //angle of tab border: from 0 (vertcal border) to any size
     FTabHeight: Integer;
@@ -113,7 +119,7 @@ type
     //show
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
-    FTabShowPlusText: string; //text of "plus" tab
+    FTabShowPlusText: atString; //text of "plus" tab
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabDragEnabled: boolean; //enable drag-drop
@@ -141,7 +147,7 @@ type
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintBgTo(C: TCanvas; const ARect: TRect);
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
-      const ACaption: string;
+      const ACaption: atString;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
       ACloseBtn: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
@@ -177,7 +183,7 @@ type
     property TabIndex: Integer read FTabIndex write SetTabIndex;
     procedure AddTab(
       AIndex: Integer;
-      const ACaption: string;
+      const ACaption: atString;
       AObject: TObject = nil;
       AModified: boolean = false;
       AColor: TColor = clNone);
@@ -215,7 +221,7 @@ type
     property TabHeight: Integer read FTabHeight write FTabHeight;
     property TabWidthMin: Integer read FTabWidthMin write FTabWidthMin;
     property TabWidthMax: Integer read FTabWidthMax write FTabWidthMax;
-    property TabNumPrefix: string read FTabNumPrefix write FTabNumPrefix;
+    property TabNumPrefix: atString read FTabNumPrefix write FTabNumPrefix;
     property TabIndentDropI: Integer read FTabIndentDropI write FTabIndentDropI;
     property TabIndentInter: Integer read FTabIndentInter write FTabIndentInter;
     property TabIndentInit: Integer read FTabIndentInit write FTabIndentInit;
@@ -232,7 +238,7 @@ type
 
     property TabShowClose: TATTabShowClose read FTabShowClose write FTabShowClose;
     property TabShowPlus: boolean read FTabShowPlus write FTabShowPlus;
-    property TabShowPlusText: string read FTabShowPlusText write FTabShowPlusText;
+    property TabShowPlusText: atString read FTabShowPlusText write FTabShowPlusText;
     //property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll; //disabled
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
@@ -540,7 +546,7 @@ begin
 end;
 
 procedure TATTabs.DoPaintTabTo(
-  C: TCanvas; ARect: TRect; const ACaption: string;
+  C: TCanvas; ARect: TRect; const ACaption: atString;
   ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
   ACloseBtn: boolean);
 var
@@ -594,13 +600,14 @@ begin
   FBitmapText.Canvas.Brush.Color:= ATabBg;
   FBitmapText.Canvas.FillRect(Rect(0, 0, FBitmapText.Width, FBitmapText.Height));
   FBitmapText.Canvas.Font.Assign(Self.Font);
-  FBitmapText.Canvas.TextOut(
-    FTabAngle,
-    FTabIndentText,
-    ACaption);
-  C.CopyRect(
-    RText,
-    FBitmapText.Canvas,
+
+  {$ifdef WIDE}
+  Windows.TextOutW(FBitmapText.Canvas.Handle, FTabAngle, FTabIndentText, PWideChar(ACaption), Length(ACaption));
+  {$else}
+  FBitmapText.Canvas.TextOut(FTabAngle, FTabIndentText, ACaption);
+  {$endif}
+
+  C.CopyRect(RText, FBitmapText.Canvas,
     Rect(0, 0, RText.Right-RText.Left, RText.Bottom-RText.Top));
 
   //borders
@@ -1125,7 +1132,7 @@ end;
 
 procedure TATTabs.AddTab(
   AIndex: Integer;
-  const ACaption: string;
+  const ACaption: atString;
   AObject: TObject = nil;
   AModified: boolean = false;
   AColor: TColor = clNone);
