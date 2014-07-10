@@ -813,9 +813,12 @@ var
 begin
   AType:= aeBackground;
   ARect:= ClientRect;
+
+  //painting of BG is little different then other elements:
+  //paint fillrect anyway, then maybe paint ownerdraw
+  DoPaintBgTo(C, ARect);
   if IsPaintNeeded(AType, -1, C, ARect) then
   begin
-    DoPaintBgTo(C, ARect);
     DoPaintAfter(AType, -1, C, ARect);
   end;
 
