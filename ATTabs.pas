@@ -53,6 +53,7 @@ type
     );
 
 type
+  TATTabOverEvent = procedure (Sender: TObject; ATabIndex: Integer) of object;
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
     var ACanClose, ACanContinue: boolean) of object;
   TATTabMenuEvent = procedure (Sender: TObject;
@@ -143,6 +144,7 @@ type
     FOnTabDrawBefore: TATTabDrawEvent;
     FOnTabDrawAfter: TATTabDrawEvent;
     FOnTabEmpty: TNotifyEvent;
+    FOnTabOver: TATTabOverEvent;
 
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintBgTo(C: TCanvas; const ARect: TRect);
@@ -254,6 +256,7 @@ type
     property OnTabDrawBefore: TATTabDrawEvent read FOnTabDrawBefore write FOnTabDrawBefore;
     property OnTabDrawAfter: TATTabDrawEvent read FOnTabDrawAfter write FOnTabDrawAfter;
     property OnTabEmpty: TNotifyEvent read FOnTabEmpty write FOnTabEmpty;
+    property OnTabOver: TATTabOverEvent read FOnTabOver write FOnTabOver;
   end;
 
 implementation
@@ -1087,6 +1090,9 @@ begin
   inherited;
   FTabIndexOver:= GetTabAt(X, Y);
   FTabIndexDrop:= FTabIndexOver;
+
+  if Assigned(FOnTabOver) then
+    FOnTabOver(Self, FTabIndexOver);
 
   if FMouseDown and FTabDragEnabled and (TabCount>0) then
   begin
