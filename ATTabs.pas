@@ -123,6 +123,7 @@ type
     FTabShowPlusText: atString; //text of "plus" tab
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
+    FTabMiddleClickClose: boolean;
     FTabDragEnabled: boolean; //enable drag-drop
     FTabDragOutEnabled: boolean; //also enable drag-drop to another controls
     FTabDragCursor: TCursor;
@@ -241,9 +242,9 @@ type
     property TabShowClose: TATTabShowClose read FTabShowClose write FTabShowClose;
     property TabShowPlus: boolean read FTabShowPlus write FTabShowPlus;
     property TabShowPlusText: atString read FTabShowPlusText write FTabShowPlusText;
-    //property TabShowScroll: boolean read FTabShowScroll write FTabShowScroll; //disabled
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
+    property TabMiddleClickClose: boolean read FTabMiddleClickClose write FTabMiddleClickClose;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
     property TabDragOutEnabled: boolean read FTabDragOutEnabled write FTabDragOutEnabled;
     property TabDragCursor: TCursor read FTabDragCursor write FTabDragCursor;
@@ -493,6 +494,7 @@ begin
   FTabShowPlusText:= '+';
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
+  FTabMiddleClickClose:= true;
   FTabDragEnabled:= true;
   FTabDragOutEnabled:= true;
 
@@ -1040,6 +1042,14 @@ begin
   FMouseDown:= true;
   FMouseDownPnt:= Point(X, Y);
   FTabIndexOver:= GetTabAt(X, Y);
+
+  if Button=mbMiddle then
+  begin
+    if FTabMiddleClickClose then
+      if FTabIndexOver>=0 then
+        DeleteTab(FTabIndexOver, true, false);
+    Exit;
+  end;
 
   if Button=mbLeft then
   begin

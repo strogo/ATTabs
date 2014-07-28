@@ -1,4 +1,7 @@
 
+1.1.1
++ prop TabMiddleClickClose
+
 1.1.0
 + widestring used in Delphi7
 + drag-drop of tabs works between all ATTabs controls, even no events needed
