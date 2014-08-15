@@ -56,11 +56,11 @@ type
   TATTabOverEvent = procedure (Sender: TObject; ATabIndex: Integer) of object;
   TATTabCloseEvent = procedure (Sender: TObject; ATabIndex: Integer;
     var ACanClose, ACanContinue: boolean) of object;
-  TATTabMenuEvent = procedure (Sender: TObject;
-    var ACanShow: boolean) of object;
+  TATTabMenuEvent = procedure (Sender: TObject; var ACanShow: boolean) of object;
   TATTabDrawEvent = procedure (Sender: TObject;
     AElemType: TATTabElemType; ATabIndex: Integer;
     ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean) of object;
+  TATTabMoveEvent = procedure (Sender: TObject; NFrom, NTo: Integer) of object;  
 
 type
   TATTriType = (triDown, triLeft, triRight);
@@ -146,6 +146,7 @@ type
     FOnTabDrawAfter: TATTabDrawEvent;
     FOnTabEmpty: TNotifyEvent;
     FOnTabOver: TATTabOverEvent;
+    FOnTabMove: TATTabMoveEvent;
 
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintBgTo(C: TCanvas; const ARect: TRect);
@@ -258,6 +259,7 @@ type
     property OnTabDrawAfter: TATTabDrawEvent read FOnTabDrawAfter write FOnTabDrawAfter;
     property OnTabEmpty: TNotifyEvent read FOnTabEmpty write FOnTabEmpty;
     property OnTabOver: TATTabOverEvent read FOnTabOver write FOnTabOver;
+    property OnTabMove: TATTabMoveEvent read FOnTabMove write FOnTabMove;
   end;
 
 implementation
@@ -1168,9 +1170,15 @@ begin
   if IsIndexOk(AIndex) then
     FTabList.Insert(AIndex, Data)
   else
+  begin
     FTabList.Add(Data);
+    AIndex:= TabCount-1;
+  end;
 
   Invalidate;
+
+  if Assigned(FOnTabMove) then
+    FOnTabMove(Self, -1, AIndex);
 end;
 
 function TATTabs.DeleteTab(AIndex: Integer; AAllowEvent, AWithCancelBtn: boolean): boolean;
@@ -1213,6 +1221,9 @@ begin
     if (TabCount=0) then
       if Assigned(FOnTabEmpty) then
         FOnTabEmpty(Self);
+
+    if Assigned(FOnTabMove) then
+      FOnTabMove(Self, AIndex, -1);    
   end;
 
   Result:= true;
@@ -1374,6 +1385,9 @@ begin
 
   FTabList.Move(NFrom, NTo);
   SetTabIndex(NTo);
+
+  if Assigned(FOnTabMove) then
+    FOnTabMove(Self, NFrom, NTo);
 end;
 
 procedure TATTabs.DoTabDropToOtherControl(ATarget: TControl; const APnt: TPoint);

@@ -25,6 +25,7 @@ type
     chkPlus: TCheckBox;
     Label1: TLabel;
     chkNums: TCheckBox;
+    labStatus: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
@@ -39,6 +40,7 @@ type
   private
     { Private declarations }
     LockEdit: boolean;
+    procedure TabMove(A: TObject; NFrom, NTo: Integer);
     procedure TabClick(A: TObject);
     procedure TabPlusClick(A: TObject);
     procedure TabClose(Sender: TObject; ATabIndex: Integer;
@@ -74,6 +76,7 @@ begin
   t.OnTabClick:= TabClick;
   t.OnTabPlusClick:= TabPlusClick;
   t.OnTabClose:= TabClose;
+  t.OnTabMove:= TabMove;
 
   t.AddTab(-1, 'Tab');
   t.AddTab(-1, 'Tab middle len', nil, false, clGreen);
@@ -293,6 +296,15 @@ procedure TForm1.chkNumsClick(Sender: TObject);
 begin
   t1.TabNumPrefix:= IfThen(chkNums.Checked, '%d. ', '');
   t1.Invalidate;
+end;
+
+procedure TForm1.TabMove(A: TObject; NFrom, NTo: Integer);
+var s: string;
+begin
+  if NFrom=-1 then s:= 'add at index '+IntToStr(NTo) else
+    if NTo=-1 then s:= 'delete at index '+IntToStr(NFrom) else
+      s:= Format('move from %d to %d', [NFrom, NTo]);
+  labStatus.Caption:= 'Status: '+s;
 end;
 
 end.

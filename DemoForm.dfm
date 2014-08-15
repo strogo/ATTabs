@@ -23,6 +23,13 @@ object Form1: TForm1
     Height = 13
     Caption = 'Note: enabled drag-drop from top tabs to bottom tabs'
   end
+  object labStatus: TLabel
+    Left = 144
+    Top = 256
+    Width = 35
+    Height = 13
+    Caption = 'Status:'
+  end
   object bAdd: TButton
     Left = 144
     Top = 144
