@@ -123,7 +123,7 @@ type
     FTabShowPlusText: atString; //text of "plus" tab
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
-    FTabMiddleClickClose: boolean;
+    FTabMiddleClickClose: boolean; //enable close tab by middle-click
     FTabDragEnabled: boolean; //enable drag-drop
     FTabDragOutEnabled: boolean; //also enable drag-drop to another controls
     FTabDragCursor: TCursor;
@@ -494,7 +494,7 @@ begin
   FTabShowPlusText:= '+';
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
-  FTabMiddleClickClose:= true;
+  FTabMiddleClickClose:= false;
   FTabDragEnabled:= true;
   FTabDragOutEnabled:= true;
 
