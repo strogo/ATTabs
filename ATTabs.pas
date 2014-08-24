@@ -472,18 +472,18 @@ begin
   FTabBottom:= false;
   FTabAngle:= 5;
   FTabHeight:= 24;
-  FTabWidthMin:= 26;
+  FTabWidthMin:= 20;
   FTabWidthMax:= 130;
   FTabWidthHideX:= 55;
   FTabNumPrefix:= '';
   FTabDragCursor:= crDrag;
-  FTabIndentLeft:= 8;
+  FTabIndentLeft:= 6;
   FTabIndentDropI:= 4;
   FTabIndentInter:= 0;
   FTabIndentInit:= 4;
   FTabIndentTop:= 5;
   FTabIndentText:= 6;
-  FTabIndentXRight:= 3;
+  FTabIndentXRight:= 10;
   FTabIndentXInner:= 3;
   FTabIndentXSize:= 12;
   FTabIndentArrowSize:= 4;
@@ -493,7 +493,7 @@ begin
   
   FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
-  FTabShowPlusText:= '+';
+  FTabShowPlusText:= ' + ';
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabMiddleClickClose:= false;
@@ -571,8 +571,8 @@ begin
   else
     AInvert:= 1;
 
-  NIndentL:= Max(FTabIndentLeft, FTabAngle);
-  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight+FTabIndentXSize div 2);
+  NIndentL:= FTabAngle+FTabIndentLeft;
+  NIndentR:= NIndentL+IfThen(ACloseBtn, FTabIndentXRight);
   RText:= Rect(ARect.Left+FTabAngle, ARect.Top, ARect.Right-FTabAngle, ARect.Bottom);
   C.FillRect(RText);
   RText:= Rect(ARect.Left+NIndentL, ARect.Top, ARect.Right-NIndentR, ARect.Bottom);
@@ -609,9 +609,9 @@ begin
   FBitmapText.Canvas.Font.Assign(Self.Font);
 
   {$ifdef WIDE}
-  Windows.TextOutW(FBitmapText.Canvas.Handle, FTabAngle, FTabIndentText, PWideChar(ACaption), Length(ACaption));
+  Windows.TextOutW(FBitmapText.Canvas.Handle, 0, FTabIndentText, PWideChar(ACaption), Length(ACaption));
   {$else}
-  FBitmapText.Canvas.TextOut(FTabAngle, FTabIndentText, ACaption);
+  FBitmapText.Canvas.TextOut(0, FTabIndentText, ACaption);
   {$endif}
 
   C.CopyRect(RText, FBitmapText.Canvas,
@@ -705,19 +705,16 @@ begin
 end;
 
 function TATTabs.GetTabRectWidth(APlusBtn: boolean): Integer;
-var
-  NWidth: Integer;
 begin
   if APlusBtn then
-    NWidth:= GetTabWidth_Plus_Raw
+    Result:= GetTabWidth_Plus_Raw
   else
-  begin
-    NWidth:= FTabWidthMax;
-  end;
+    Result:= FTabWidthMax;
 
-  Result:= NWidth +
-    2 * (FTabAngle + FTabIndentLeft);
-     //+ IfThen(ACloseBtn, FTabIndentLeft+FTabIndentXRight);
+  Inc(Result, + 2*FTabAngle + 2*FTabIndentLeft);
+
+  if Result<FTabWidthMin then
+    Result:= FTabWidthMin;   
 end;
 
 
@@ -751,7 +748,7 @@ var
   P: TPoint;
 begin
   P:= Point(
-    ARect.Right-FTabAngle-FTabIndentLeft-FTabIndentXRight,
+    ARect.Right-FTabAngle-FTabIndentXRight,
     (ARect.Top+ARect.Bottom) div 2 + 1);
   Dec(P.X, FTabIndentXSize div 2);
   Dec(P.Y, FTabIndentXSize div 2);
@@ -1165,7 +1162,6 @@ begin
   Data.TabObject:= AObject;
   Data.TabModified:= AModified;
   Data.TabColor:= AColor;
-  //Data.TabWidth:= GetTabRectWidth(FTabShowClose, false);
 
   if IsIndexOk(AIndex) then
     FTabList.Insert(AIndex, Data)

@@ -70,7 +70,6 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   //default tabs
   t:= TATTabs.Create(Self);
-  //t.TabAngle:= 0; /////////test
   t.Parent:= Self;
   t.Align:= alTop;
   t.OnTabClick:= TabClick;
@@ -98,6 +97,7 @@ begin
   t1.OnTabDrawAfter:= TabDrawAfter;
   t1.ColorBg:= $F9EADB;
 
+  t1.TabAngle:= 4;
   t1.TabHeight:= 30;
   t1.TabWidthMax:= 170;
   t1.TabIndentTop:= 20;
@@ -105,7 +105,7 @@ begin
   t1.TabIndentXInner:= 3;
   t1.TabIndentInit:= 4;
   //t1.TabShowclose:= tbShowActive;
-  t1.TabShowplus:= false;
+  //t1.TabShowplus:= false;
   //t1.TabShowMenu:= false;
   t1.TabIndentDropI:= 6;
   t1.TabBottom:= true;
@@ -119,12 +119,17 @@ begin
   t0:= TATTabs.Create(Self);
   t0.Parent:= Self;
   t0.Align:= alBottom;
+  t0.Font.Size:= 8;
 
   t0.Height:= 42;
-  //t0.TabShowBorderActiveLow:= true;
+  t0.TabAngle:= 0;
+  t0.TabIndentInter:= 2;
   t0.TabIndentInit:= 2;
   t0.TabIndentTop:= 4;
   t0.TabIndentXSize:= 13;
+  t0.TabWidthMin:= 18;
+  t0.TabDragEnabled:= false;
+
   t0.Font.Color:= clBlack;
   t0.ColorBg:= $F9EADB;
   t0.ColorBorderActive:= $ACA196;
@@ -138,10 +143,6 @@ begin
   t0.ColorCloseX:= $7B6E60;
   t0.ColorArrow:= $5C5751;
   t0.ColorArrowOver:= t0.ColorArrow;
-
-  t0.TabAngle:= 0;
-  t0.TabIndentInter:= 2;
-  t0.TabDragEnabled:= false;
 
   t0.AddTab(-1, 'Firefox');
   t0.AddTab(-1, 'A tab _____________________________________________________', nil, false, clGreen);

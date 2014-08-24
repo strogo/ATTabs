@@ -88,7 +88,7 @@ object Form1: TForm1
     Top = 88
     Width = 161
     Height = 17
-    Caption = '"x" buttons'
+    Caption = 'top tabs: "x" buttons'
     TabOrder = 6
     OnClick = chkXClick
   end
@@ -97,7 +97,7 @@ object Form1: TForm1
     Top = 104
     Width = 169
     Height = 17
-    Caption = '"+" tab'
+    Caption = 'top tabs: "+" tab'
     TabOrder = 7
     OnClick = chkPlusClick
   end
@@ -106,7 +106,7 @@ object Form1: TForm1
     Top = 120
     Width = 185
     Height = 17
-    Caption = 'numbers on bottom'
+    Caption = 'bottom tabs: numbers'
     TabOrder = 8
     OnClick = chkNumsClick
   end
