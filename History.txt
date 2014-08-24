@@ -1,4 +1,7 @@
 
+1.1.3
+- fix: incorrect left/right indent for plus-tab
+
 1.1.2
 + event OnTabMove
 + prop TabMiddleClickClose
