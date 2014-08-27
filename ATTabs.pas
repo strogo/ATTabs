@@ -78,6 +78,7 @@ type
     //drag-drop
     FMouseDown: boolean;
     FMouseDownPnt: TPoint;
+    FMouseDownDbl: boolean;
     FMouseDrag: boolean;
 
     //colors
@@ -1077,6 +1078,16 @@ begin
 
       else
         begin
+          //dbl click?
+          if FMouseDownDbl then
+          begin
+            FMouseDownDbl:= false;
+            if FTabDoubleClickPlus and (FTabIndexOver=-1) then
+              if Assigned(FOnTabPlusClick) then
+                FOnTabPlusClick(Self);
+            Exit  
+          end;
+
           if IsShowX(FTabIndexOver) then
           begin
             R:= GetTabRect(FTabIndexOver);
@@ -1463,12 +1474,7 @@ end;
 
 procedure TATTabs.DblClick;
 begin
-  inherited;
-  FMouseDown:= false;
-  if FTabDoubleClickPlus then
-    if FTabIndexOver<0 then
-      if Assigned(FOnTabPlusClick) then
-        FOnTabPlusClick(Self);
+  FMouseDownDbl:= true;
 end;
 
 end.
