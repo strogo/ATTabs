@@ -124,6 +124,7 @@ type
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabMiddleClickClose: boolean; //enable close tab by middle-click
+    FTabDoubleClickPlus: boolean; //enable call "+" tab with dbl-click on empty area
     FTabDragEnabled: boolean; //enable drag-drop
     FTabDragOutEnabled: boolean; //also enable drag-drop to another controls
     FTabDragCursor: TCursor;
@@ -197,6 +198,7 @@ type
   protected
     procedure Paint; override;
     procedure Resize; override;
+    procedure DblClick; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -246,6 +248,7 @@ type
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
     property TabMiddleClickClose: boolean read FTabMiddleClickClose write FTabMiddleClickClose;
+    property TabDoubleClickPlus: boolean read FTabDoubleClickPlus write FTabDoubleClickPlus;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
     property TabDragOutEnabled: boolean read FTabDragOutEnabled write FTabDragOutEnabled;
     property TabDragCursor: TCursor read FTabDragCursor write FTabDragCursor;
@@ -497,6 +500,7 @@ begin
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabMiddleClickClose:= false;
+  FTabDoubleClickPlus:= false;
   FTabDragEnabled:= true;
   FTabDragOutEnabled:= true;
 
@@ -1455,6 +1459,16 @@ begin
       else
         TabIndex:= TabIndex-1;
     end;
+end;
+
+procedure TATTabs.DblClick;
+begin
+  inherited;
+  FMouseDown:= false;
+  if FTabDoubleClickPlus then
+    if FTabIndexOver<0 then
+      if Assigned(FOnTabPlusClick) then
+        FOnTabPlusClick(Self);
 end;
 
 end.

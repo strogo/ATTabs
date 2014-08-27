@@ -76,6 +76,7 @@ begin
   t.OnTabPlusClick:= TabPlusClick;
   t.OnTabClose:= TabClose;
   t.OnTabMove:= TabMove;
+  t.TabDoubleClickPlus:= true;
 
   t.AddTab(-1, 'Tab');
   t.AddTab(-1, 'Tab middle len', nil, false, clGreen);
