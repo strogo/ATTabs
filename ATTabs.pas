@@ -472,7 +472,7 @@ begin
   FColorTabActive:= $808080;
   FColorTabPassive:= $786868;
   FColorTabOver:= $A08080;
-  FColorFontModified:= clRed;////////
+  FColorFontModified:= $A00000;
   FColorBorderActive:= $A0A0A0;
   FColorBorderPassive:= $A07070;
   FColorCloseBg:= clNone;
