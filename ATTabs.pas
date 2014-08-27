@@ -89,6 +89,7 @@ type
     FColorTabActive: TColor; //color of active tab
     FColorTabPassive: TColor; //color of inactive tabs
     FColorTabOver: TColor; //color of inactive tabs, mouse-over
+    FColorFontModified: TColor;
     FColorCloseBg: TColor; //color of small square with "x" mark, inactive
     FColorCloseBgOver: TColor; //color of small square with "x" mark, mouse-over
     FColorCloseBorderOver: TColor; //color of 1px border of "x" mark, mouse-over
@@ -122,6 +123,7 @@ type
     FTabShowClose: TATTabShowClose; //show mode for "x" buttons
     FTabShowPlus: boolean; //show "plus" tab
     FTabShowPlusText: atString; //text of "plus" tab
+    FTabShowModifiedText: atString;
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabMiddleClickClose: boolean; //enable close tab by middle-click
@@ -155,7 +157,7 @@ type
     procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
       const ACaption: atString;
       ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
-      ACloseBtn: boolean);
+      ACloseBtn, AModified: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
       AColorArr, AColorBg: TColor);
     procedure DoPaintXTo(C: TCanvas; const R: TRect;
@@ -216,6 +218,7 @@ type
     property ColorTabActive: TColor read FColorTabActive write FColorTabActive;
     property ColorTabPassive: TColor read FColorTabPassive write FColorTabPassive;
     property ColorTabOver: TColor read FColorTabOver write FColorTabOver;
+    property ColorFontModified: TColor read FColorFontModified write FColorFontModified;
     property ColorCloseBg: TColor read FColorCloseBg write FColorCloseBg;
     property ColorCloseBgOver: TColor read FColorCloseBgOver write FColorCloseBgOver;
     property ColorCloseBorderOver: TColor read FColorCloseBorderOver write FColorCloseBorderOver;
@@ -246,6 +249,7 @@ type
     property TabShowClose: TATTabShowClose read FTabShowClose write FTabShowClose;
     property TabShowPlus: boolean read FTabShowPlus write FTabShowPlus;
     property TabShowPlusText: atString read FTabShowPlusText write FTabShowPlusText;
+    property TabShowModifiedText: atString read FTabShowModifiedText write FTabShowModifiedText;
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
     property TabMiddleClickClose: boolean read FTabMiddleClickClose write FTabMiddleClickClose;
@@ -269,7 +273,10 @@ type
 implementation
 
 uses
-  SysUtils, Dialogs, Forms, Math;
+  SysUtils, StrUtils,
+  Dialogs,
+  Forms,
+  Math;
 
 function _FindControl(Pnt: TPoint): TControl;
 begin
@@ -465,6 +472,7 @@ begin
   FColorTabActive:= $808080;
   FColorTabPassive:= $786868;
   FColorTabOver:= $A08080;
+  FColorFontModified:= clRed;////////
   FColorBorderActive:= $A0A0A0;
   FColorBorderPassive:= $A07070;
   FColorCloseBg:= clNone;
@@ -499,6 +507,7 @@ begin
   FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
   FTabShowPlusText:= ' + ';
+  FTabShowModifiedText:= #$95;
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabMiddleClickClose:= false;
@@ -561,13 +570,14 @@ end;
 procedure TATTabs.DoPaintTabTo(
   C: TCanvas; ARect: TRect; const ACaption: atString;
   ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
-  ACloseBtn: boolean);
+  ACloseBtn, AModified: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
   RText: TRect;
   NIndentL, NIndentR: Integer;
   AType: TATTabElemType;
   AInvert: Integer;
+  TempCaption: atString;
 begin
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
@@ -614,10 +624,14 @@ begin
   FBitmapText.Canvas.FillRect(Rect(0, 0, FBitmapText.Width, FBitmapText.Height));
   FBitmapText.Canvas.Font.Assign(Self.Font);
 
+  if AModified then
+    FBitmapText.Canvas.Font.Color:= FColorFontModified;
+  TempCaption:= IfThen(AModified, FTabShowModifiedText) + ACaption;
+
   {$ifdef WIDE}
-  Windows.TextOutW(FBitmapText.Canvas.Handle, 0, FTabIndentText, PWideChar(ACaption), Length(ACaption));
+  Windows.TextOutW(FBitmapText.Canvas.Handle, 0, FTabIndentText, PWideChar(TempCaption), Length(TempCaption));
   {$else}
-  FBitmapText.Canvas.TextOut(0, FTabIndentText, ACaption);
+  FBitmapText.Canvas.TextOut(0, FTabIndentText, TempCaption);
   {$endif}
 
   C.CopyRect(RText, FBitmapText.Canvas,
@@ -867,6 +881,7 @@ begin
         clNone,
         AColorXBg,
         AColorXBorder,
+        false,
         false
         );
       DoPaintAfter(AType, -1, C, ARect);
@@ -894,7 +909,8 @@ begin
           TATTabData(FTabList[i]).TabColor,
           AColorXBg,
           AColorXBorder,
-          IsShowX(i)
+          IsShowX(i),
+          TATTabData(FTabList[i]).TabModified
           );
         DoPaintAfter(AType, i, C, ARect);
       end;
@@ -917,7 +933,8 @@ begin
         TATTabData(FTabList[i]).TabColor,
         AColorXBg,
         AColorXBorder,
-        IsShowX(i)
+        IsShowX(i),
+        TATTabData(FTabList[i]).TabModified
         );
       DoPaintAfter(aeTabActive, i, C, ARect);
     end;  

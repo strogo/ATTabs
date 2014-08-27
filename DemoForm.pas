@@ -26,6 +26,7 @@ type
     Label1: TLabel;
     chkNums: TCheckBox;
     labStatus: TLabel;
+    bMod: TButton;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
@@ -37,6 +38,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure chkPlusClick(Sender: TObject);
     procedure chkNumsClick(Sender: TObject);
+    procedure bModClick(Sender: TObject);
   private
     { Private declarations }
     LockEdit: boolean;
@@ -307,6 +309,17 @@ begin
     if NTo=-1 then s:= 'delete at index '+IntToStr(NFrom) else
       s:= Format('move from %d to %d', [NFrom, NTo]);
   labStatus.Caption:= 'Status: '+s;
+end;
+
+procedure TForm1.bModClick(Sender: TObject);
+var
+  d: TATTabData;
+begin
+  d:= t.GetTabData(t.tabIndex);
+  if d=nil then Exit;
+
+  d.TabModified:= not d.TabModified;
+  t.Invalidate;
 end;
 
 end.

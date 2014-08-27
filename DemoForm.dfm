@@ -110,4 +110,13 @@ object Form1: TForm1
     TabOrder = 8
     OnClick = chkNumsClick
   end
+  object bMod: TButton
+    Left = 144
+    Top = 176
+    Width = 113
+    Height = 25
+    Caption = 'toggle modified'
+    TabOrder = 9
+    OnClick = bModClick
+  end
 end
