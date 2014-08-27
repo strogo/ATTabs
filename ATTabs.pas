@@ -1018,6 +1018,16 @@ begin
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
 
+  //dbl click?
+  if FMouseDownDbl then
+  begin
+    FMouseDownDbl:= false;
+    if FTabDoubleClickPlus and (FTabIndexOver=-1) then
+      if Assigned(FOnTabPlusClick) then
+        FOnTabPlusClick(Self);
+    Exit
+  end;
+
   if FMouseDrag then
   begin
     FMouseDrag:= false;
@@ -1078,16 +1088,6 @@ begin
 
       else
         begin
-          //dbl click?
-          if FMouseDownDbl then
-          begin
-            FMouseDownDbl:= false;
-            if FTabDoubleClickPlus and (FTabIndexOver=-1) then
-              if Assigned(FOnTabPlusClick) then
-                FOnTabPlusClick(Self);
-            Exit  
-          end;
-
           if IsShowX(FTabIndexOver) then
           begin
             R:= GetTabRect(FTabIndexOver);
