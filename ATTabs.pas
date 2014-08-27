@@ -457,6 +457,7 @@ begin
 
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
+  FMouseDownDbl:= false;
   FMouseDrag:= false;
 
   FColorBg:= clBlack;
