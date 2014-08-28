@@ -507,7 +507,7 @@ begin
   FTabShowClose:= tbShowAll;
   FTabShowPlus:= true;
   FTabShowPlusText:= ' + ';
-  FTabShowModifiedText:= #$07;
+  FTabShowModifiedText:= #$95;
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
   FTabMiddleClickClose:= false;
