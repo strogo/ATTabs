@@ -1398,8 +1398,9 @@ begin
     else Result:= false;
   end;
 
-  if (AIndex<>FTabIndex) and (FTabWidth<FTabWidthHideX) then
-    Result:= false;
+  //if (AIndex<>FTabIndex) then //let's hide x for all tabs
+    if (FTabWidth<FTabWidthHideX) then
+      Result:= false;
 end;
 
 procedure TATTabs.DoTabDrop;
