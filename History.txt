@@ -1,6 +1,12 @@
 
+1.2.0
++ prop TabShowModifiedText
++ prop ColorFontModified
++ Data.TabModified used actually to show "*"
+- show "cancel" for close one tab
+
 1.1.3
-- fix: incorrect left/right indent for plus-tab
+- fix incorrect left indent for plus-tab
 
 1.1.2
 + event OnTabMove
