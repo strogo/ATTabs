@@ -1079,7 +1079,7 @@ begin
   begin
     if FTabMiddleClickClose then
       if FTabIndexOver>=0 then
-        DeleteTab(FTabIndexOver, true, false);
+        DeleteTab(FTabIndexOver, true, true);
     Exit;
   end;
 
@@ -1112,7 +1112,7 @@ begin
             R:= GetTabRect_X(R);
             if PtInRect(R, Point(X, Y)) then
             begin
-              DeleteTab(FTabIndexOver, true, false);
+              DeleteTab(FTabIndexOver, true, true);
               Exit
             end;
           end;
