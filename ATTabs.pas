@@ -746,8 +746,9 @@ begin
 
   Inc(Result, + 2*FTabAngle + 2*FTabIndentLeft);
 
-  if Result<FTabWidthMin then
-    Result:= FTabWidthMin;   
+  if not APlusBtn then
+    if Result<FTabWidthMin then
+      Result:= FTabWidthMin;   
 end;
 
 
