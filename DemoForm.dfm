@@ -30,6 +30,20 @@ object Form1: TForm1
     Height = 13
     Caption = 'Status:'
   end
+  object Label2: TLabel
+    Left = 144
+    Top = 72
+    Width = 44
+    Height = 13
+    Caption = 'top tabs:'
+  end
+  object Label3: TLabel
+    Left = 344
+    Top = 72
+    Width = 62
+    Height = 13
+    Caption = 'bottom tabs:'
+  end
   object bAdd: TButton
     Left = 144
     Top = 144
@@ -88,7 +102,7 @@ object Form1: TForm1
     Top = 88
     Width = 161
     Height = 17
-    Caption = 'top tabs: "x" buttons'
+    Caption = 'show "x" buttons'
     TabOrder = 6
     OnClick = chkXClick
   end
@@ -97,16 +111,16 @@ object Form1: TForm1
     Top = 104
     Width = 169
     Height = 17
-    Caption = 'top tabs: "+" tab'
+    Caption = 'show "+" tab'
     TabOrder = 7
     OnClick = chkPlusClick
   end
   object chkNums: TCheckBox
-    Left = 144
-    Top = 120
-    Width = 185
+    Left = 344
+    Top = 88
+    Width = 161
     Height = 17
-    Caption = 'bottom tabs: numbers'
+    Caption = 'show numbers'
     TabOrder = 8
     OnClick = chkNumsClick
   end
@@ -118,5 +132,14 @@ object Form1: TForm1
     Caption = 'toggle modified'
     TabOrder = 9
     OnClick = bModClick
+  end
+  object chkEntire: TCheckBox
+    Left = 144
+    Top = 120
+    Width = 177
+    Height = 17
+    Caption = 'color entire tab'
+    TabOrder = 10
+    OnClick = chkEntireClick
   end
 end

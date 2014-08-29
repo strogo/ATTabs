@@ -133,6 +133,7 @@ type
     FTabShowModifiedText: atString;
     FTabShowMenu: boolean; //show down arrow (menu of tabs)
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
+    FTabShowEntireColor: boolean;
     FTabMiddleClickClose: boolean; //enable close tab by middle-click
     FTabDoubleClickPlus: boolean; //enable call "+" tab with dbl-click on empty area
     FTabDragEnabled: boolean; //enable drag-drop
@@ -259,6 +260,7 @@ type
     property TabShowModifiedText: atString read FTabShowModifiedText write FTabShowModifiedText;
     property TabShowMenu: boolean read FTabShowMenu write FTabShowMenu;
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
+    property TabShowEntireColor: boolean read FTabShowEntireColor write FTabShowEntireColor;
     property TabMiddleClickClose: boolean read FTabMiddleClickClose write FTabMiddleClickClose;
     property TabDoubleClickPlus: boolean read FTabDoubleClickPlus write FTabDoubleClickPlus;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
@@ -517,6 +519,7 @@ begin
   FTabShowModifiedText:= '*';
   FTabShowMenu:= true;
   FTabShowBorderActiveLow:= false;
+  FTabShowEntireColor:= false;
   FTabMiddleClickClose:= false;
   FTabDoubleClickPlus:= false;
   FTabDragEnabled:= true;
@@ -586,6 +589,9 @@ var
   AInvert: Integer;
   TempCaption: atString;
 begin
+  if FTabShowEntireColor and (ATabHilite<>clNone) then
+    ATabBg:= ATabHilite;
+
   C.Pen.Color:= ATabBg;
   C.Brush.Color:= ATabBg;
 

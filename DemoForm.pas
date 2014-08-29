@@ -27,6 +27,9 @@ type
     chkNums: TCheckBox;
     labStatus: TLabel;
     bMod: TButton;
+    Label2: TLabel;
+    chkEntire: TCheckBox;
+    Label3: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
@@ -39,6 +42,7 @@ type
     procedure chkPlusClick(Sender: TObject);
     procedure chkNumsClick(Sender: TObject);
     procedure bModClick(Sender: TObject);
+    procedure chkEntireClick(Sender: TObject);
   private
     { Private declarations }
     LockEdit: boolean;
@@ -319,6 +323,12 @@ begin
   if d=nil then Exit;
 
   d.TabModified:= not d.TabModified;
+  t.Invalidate;
+end;
+
+procedure TForm1.chkEntireClick(Sender: TObject);
+begin
+  t.TabShowEntireColor:= not t.TabShowEntireColor;
   t.Invalidate;
 end;
 

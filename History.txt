@@ -1,6 +1,7 @@
 
 1.2.0
 + prop TabShowModifiedText
++ prop TabShowEntireColor
 + prop ColorFontModified
 + Data.TabModified used actually to show "*"
 + TntPopupMenu for Delphi7
