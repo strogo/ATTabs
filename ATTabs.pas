@@ -12,6 +12,7 @@ unit ATTabs;
   {$define windows}
   {$ifdef VER150} //Delphi 7
     {$define WIDE}
+    {$define TNT} //Tnt controls
   {$endif}
 {$endif}
 
@@ -26,10 +27,16 @@ uses
   LMessages,
   {$endif}
   Classes, Types, Graphics,
-  Controls, ExtCtrls, Menus;
+  Controls, ExtCtrls,
+  {$ifdef TNT}
+  TntMenus,
+  {$endif}
+  Menus;
 
 type
   atString = {$ifdef WIDE} WideString {$else} string {$endif};
+  TatPopupMenu = {$ifdef TNT} TTntPopupMenu {$else} TPopupMenu {$endif};
+  TatMenuItem = {$ifdef TNT} TTntMenuItem {$else} TMenuItem {$endif};
 
 type
   TATTabData = class
@@ -138,7 +145,7 @@ type
     FTabIndexOver: Integer;
     FTabIndexDrop: Integer;
     FTabList: TList;
-    FTabMenu: TPopupMenu;
+    FTabMenu: TatPopupMenu;
 
     FBitmap: TBitmap;
     FBitmapText: TBitmap;
@@ -1326,7 +1333,7 @@ end;
 procedure TATTabs.ShowTabMenu;
 var
   i: Integer;
-  mi: TMenuItem;
+  mi: TatMenuItem;
   RDown: TRect;
   P: TPoint;
   bShow: boolean;
@@ -1339,12 +1346,12 @@ begin
   if not bShow then Exit;
 
   if not Assigned(FTabMenu) then
-    FTabMenu:= TPopupMenu.Create(Self);
+    FTabMenu:= TatPopupMenu.Create(Self);
   FTabMenu.Items.Clear;
 
   for i:= 0 to TabCount-1 do
   begin
-    mi:= TMenuItem.Create(Self);
+    mi:= TatMenuItem.Create(Self);
     mi.Tag:= i;
     mi.Caption:= TATTabData(FTabList[i]).TabCaption;
     mi.OnClick:= TabMenuClick;

@@ -3,6 +3,7 @@
 + prop TabShowModifiedText
 + prop ColorFontModified
 + Data.TabModified used actually to show "*"
++ TntPopupMenu for Delphi7
 - show "cancel" for close one tab
 
 1.1.3
