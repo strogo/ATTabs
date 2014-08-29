@@ -83,6 +83,7 @@ begin
   t.OnTabClose:= TabClose;
   t.OnTabMove:= TabMove;
   t.TabDoubleClickPlus:= true;
+  t.TabWidthMin:= 80; //debug
 
   t.AddTab(-1, 'Tab');
   t.AddTab(-1, 'Tab middle len', nil, false, clGreen);
