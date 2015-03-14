@@ -20,12 +20,13 @@ interface
 
 uses
   {$ifdef windows}
-  Windows, Messages,
+  Windows,
   {$endif}
   {$ifdef FPC}
   LCLIntf,
   LMessages,
   {$endif}
+  Messages,
   Classes, Types, Graphics,
   Controls, ExtCtrls,
   {$ifdef TNT}
@@ -1358,7 +1359,7 @@ begin
     mi.Tag:= i;
     mi.Caption:= TATTabData(FTabList[i]).TabCaption;
     mi.OnClick:= TabMenuClick;
-    mi.RadioItem:= true;
+    //mi.RadioItem:= true; //bug in Lazarus/gtk2
     mi.Checked:= i=FTabIndex;
     FTabMenu.Items.Add(mi);
   end;
@@ -1507,4 +1508,4 @@ begin
 end;
 
 end.
-
+
