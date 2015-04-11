@@ -136,6 +136,7 @@ type
     FTabShowBorderActiveLow: boolean; //show border line below active tab (like Firefox)
     FTabShowEntireColor: boolean;
     FTabMiddleClickClose: boolean; //enable close tab by middle-click
+    FTabDoubleClickClose: boolean;
     FTabDoubleClickPlus: boolean; //enable call "+" tab with dbl-click on empty area
     FTabDragEnabled: boolean; //enable drag-drop
     FTabDragOutEnabled: boolean; //also enable drag-drop to another controls
@@ -263,6 +264,7 @@ type
     property TabShowBorderActiveLow: boolean read FTabShowBorderActiveLow write FTabShowBorderActiveLow;
     property TabShowEntireColor: boolean read FTabShowEntireColor write FTabShowEntireColor;
     property TabMiddleClickClose: boolean read FTabMiddleClickClose write FTabMiddleClickClose;
+    property TabDoubleClickClose: boolean read FTabDoubleClickClose write FTabDoubleClickClose;
     property TabDoubleClickPlus: boolean read FTabDoubleClickPlus write FTabDoubleClickPlus;
     property TabDragEnabled: boolean read FTabDragEnabled write FTabDragEnabled;
     property TabDragOutEnabled: boolean read FTabDragOutEnabled write FTabDragOutEnabled;
@@ -522,6 +524,7 @@ begin
   FTabShowBorderActiveLow:= false;
   FTabShowEntireColor:= false;
   FTabMiddleClickClose:= false;
+  FTabDoubleClickClose:= true;
   FTabDoubleClickPlus:= false;
   FTabDragEnabled:= true;
   FTabDragOutEnabled:= true;
@@ -1051,6 +1054,10 @@ begin
   if FMouseDownDbl then
   begin
     FMouseDownDbl:= false;
+
+    if FTabDoubleClickClose and (FTabIndexOver>=0) then
+      DeleteTab(FTabIndexOver, true, true)
+    else
     if FTabDoubleClickPlus and (FTabIndexOver=-1) then
       if Assigned(FOnTabPlusClick) then
         FOnTabPlusClick(Self);
