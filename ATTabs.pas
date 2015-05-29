@@ -102,6 +102,7 @@ type
     FColorCloseBgOver: TColor; //color of small square with "x" mark, mouse-over
     FColorCloseBorderOver: TColor; //color of 1px border of "x" mark, mouse-over
     FColorCloseX: TColor; //color of "x" mark
+    FColorCloseXOver: TColor; //"color of "x" mark, mouseover
     FColorArrow: TColor; //color of "down" arrow (tab menu), inactive
     FColorArrowOver: TColor; //color of "down" arrow, mouse-over
 
@@ -164,18 +165,17 @@ type
 
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintBgTo(C: TCanvas; const ARect: TRect);
-    procedure DoPaintTabTo(C: TCanvas; ARect: TRect;
-      const ACaption: atString;
-      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
-      ACloseBtn, AModified: boolean);
+    procedure DoPaintTabTo(C: TCanvas; ARect: TRect; const ACaption: atString;
+      ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg,
+  ATabCloseBorder, ATabCloseXMark: TColor; ACloseBtn, AModified: boolean);
     procedure DoPaintArrowTo(C: TCanvas; ATyp: TATTriType; ARect: TRect;
       AColorArr, AColorBg: TColor);
-    procedure DoPaintXTo(C: TCanvas; const R: TRect;
-      ATabBg, ATabCloseBg, ATabCloseBorder: TColor);
+    procedure DoPaintXTo(C: TCanvas; const R: TRect; ATabBg, ATabCloseBg,
+      ATabCloseBorder, ATabCloseXMark: TColor);
     procedure DoPaintDropMark(C: TCanvas);
     procedure SetTabIndex(AIndex: Integer);
-    procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect;
-      var AColorBg, AColorBorder: TColor);
+    procedure GetTabCloseColor(AIndex: Integer; const ARect: TRect; var AColorXBg,
+      AColorXBorder, AColorXMark: TColor);
     function IsIndexOk(AIndex: Integer): boolean;
     function IsShowX(AIndex: Integer): boolean;
     function IsPaintNeeded(AElemType: TATTabElemType;
@@ -233,6 +233,7 @@ type
     property ColorCloseBgOver: TColor read FColorCloseBgOver write FColorCloseBgOver;
     property ColorCloseBorderOver: TColor read FColorCloseBorderOver write FColorCloseBorderOver;
     property ColorCloseX: TColor read FColorCloseX write FColorCloseX;
+    property ColorCloseXOver: TColor read FColorCloseXOver write FColorCloseXOver;
     property ColorArrow: TColor read FColorArrow write FColorArrow;
     property ColorArrowOver: TColor read FColorArrowOver write FColorArrowOver;
     //spaces
@@ -491,6 +492,7 @@ begin
   FColorCloseBgOver:= $6060E0;
   FColorCloseBorderOver:= FColorCloseBgOver;
   FColorCloseX:= clLtGray;
+  FColorCloseXOver:= clWhite;
   FColorArrow:= $999999;
   FColorArrowOver:= $E0E0E0;
 
@@ -583,7 +585,7 @@ end;
 
 procedure TATTabs.DoPaintTabTo(
   C: TCanvas; ARect: TRect; const ACaption: atString;
-  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder: TColor;
+  ATabBg, ATabBorder, ATabBorderLow, ATabHilite, ATabCloseBg, ATabCloseBorder, ATabCloseXMark: TColor;
   ACloseBtn, AModified: boolean);
 var
   PL1, PL2, PR1, PR2: TPoint;
@@ -695,14 +697,14 @@ begin
     RText:= GetTabRect_X(ARect);
     if IsPaintNeeded(AType, -1, C, RText) then
     begin
-      DoPaintXTo(C, RText, ATabBg, ATabCloseBg, ATabCloseBorder);
+      DoPaintXTo(C, RText, ATabBg, ATabCloseBg, ATabCloseBorder, ATabCloseXMark);
       DoPaintAfter(AType, -1, C, RText);
     end;
   end;
 end;
 
 procedure TATTabs.DoPaintXTo(C: TCanvas; const R: TRect;
-  ATabBg, ATabCloseBg, ATabCloseBorder: TColor);
+  ATabBg, ATabCloseBg, ATabCloseBorder, ATabCloseXMark: TColor);
 var
   PX1, PX2, PX3, PX4, PXX1, PXX2: TPoint;
 begin
@@ -713,8 +715,8 @@ begin
   C.Brush.Color:= ATabBg;
 
   //paint cross by 2 polygons, each has 6 points (3 points at line edge)
-  C.Brush.Color:= FColorCloseX;
-  C.Pen.Color:= FColorCloseX;
+  C.Brush.Color:= ATabCloseXMark;
+  C.Pen.Color:= ATabCloseXMark;
 
   PXX1:= Point(R.Left+FTabIndentXInner, R.Top+FTabIndentXInner);
   PXX2:= Point(R.Right-FTabIndentXInner-1, R.Bottom-FTabIndentXInner-1);
@@ -794,12 +796,13 @@ begin
 end;
 
 procedure TATTabs.GetTabCloseColor(AIndex: Integer; const ARect: TRect;
-  var AColorBg, AColorBorder: TColor);
+  var AColorXBg, AColorXBorder, AColorXMark: TColor);
 var
   P: TPoint;
 begin
-  AColorBg:= FColorCloseBg;
-  AColorBorder:= FColorCloseBg;
+  AColorXBg:= FColorCloseBg;
+  AColorXBorder:= FColorCloseBg;
+  AColorXMark:= FColorCloseX;
 
   if FMouseDrag then Exit;
 
@@ -810,8 +813,9 @@ begin
       P:= ScreenToClient(P);
       if PtInRect(GetTabRect_X(ARect), P) then
       begin
-        AColorBg:= FColorCloseBgOver;
-        AColorBorder:= FColorCloseBorderOver;
+        AColorXBg:= FColorCloseBgOver;
+        AColorXBorder:= FColorCloseBorderOver;
+        AColorXMark:= FColorCloseXOver;
       end;
     end;
 end;
@@ -842,7 +846,7 @@ procedure TATTabs.DoPaintTo(C: TCanvas);
 var
   i: Integer;
   RBottom: TRect;
-  AColorXBg, AColorXBorder: TColor;
+  AColorXBg, AColorXBorder, AColorXMark: TColor;
   ARect, ARectDown: TRect;
   AType: TATTabElemType;
 begin
@@ -895,6 +899,7 @@ begin
         clNone,
         AColorXBg,
         AColorXBorder,
+        AColorXMark,
         false,
         false
         );
@@ -907,7 +912,7 @@ begin
     if i<>FTabIndex then
     begin
       ARect:= GetTabRect(i);
-      GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
+      GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder, AColorXMark);
       if i=FTabIndexOver then
         AType:= aeTabPassiveOver
       else
@@ -923,6 +928,7 @@ begin
           TATTabData(FTabList[i]).TabColor,
           AColorXBg,
           AColorXBorder,
+          AColorXMark,
           IsShowX(i),
           TATTabData(FTabList[i]).TabModified
           );
@@ -935,7 +941,7 @@ begin
   if IsIndexOk(i) then
   begin
     ARect:= GetTabRect(i);
-    GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder);
+    GetTabCloseColor(i, ARect, AColorXBg, AColorXBorder, AColorXMark);
     if IsPaintNeeded(aeTabActive, i, C, ARect) then
     begin
       DoPaintTabTo(C, ARect,
@@ -947,6 +953,7 @@ begin
         TATTabData(FTabList[i]).TabColor,
         AColorXBg,
         AColorXBorder,
+        AColorXMark,
         IsShowX(i),
         TATTabData(FTabList[i]).TabModified
         );
@@ -1515,4 +1522,4 @@ begin
 end;
 
 end.
-
+
