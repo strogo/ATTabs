@@ -51,6 +51,7 @@
       <Unit2>
         <Filename Value="../attabs.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATTabs"/>
       </Unit2>
     </Units>
   </ProjectOptions>

@@ -1,15 +1,10 @@
 unit DemoForm;
 
-{$ifdef fpc}
-  {$mode delphi}
-{$endif}
+{$mode delphi}
   
 interface
 
 uses
-  {$ifndef fpc}
-  Windows,
-  {$endif}
   SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, attabs;
 
