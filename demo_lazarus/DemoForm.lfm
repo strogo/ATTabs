@@ -1,0 +1,146 @@
+object Form1: TForm1
+  Left = 303
+  Height = 381
+  Top = 282
+  Width = 716
+  Caption = 'ATTabs demo'
+  ClientHeight = 381
+  ClientWidth = 716
+  Color = clBtnFace
+  Font.Color = clBlack
+  Font.Height = -13
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '1.5'
+  object Label1: TLabel
+    Left = 144
+    Height = 17
+    Top = 240
+    Width = 350
+    Caption = 'Note: enabled drag-drop from top tabs to bottom tabs'
+    ParentColor = False
+  end
+  object labStatus: TLabel
+    Left = 144
+    Height = 17
+    Top = 256
+    Width = 45
+    Caption = 'Status:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 144
+    Height = 17
+    Top = 72
+    Width = 57
+    Caption = 'top tabs:'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 344
+    Height = 17
+    Top = 72
+    Width = 83
+    Caption = 'bottom tabs:'
+    ParentColor = False
+  end
+  object bAdd: TButton
+    Left = 144
+    Height = 25
+    Top = 144
+    Width = 115
+    Caption = 'add after current'
+    OnClick = bAddClick
+    TabOrder = 0
+  end
+  object bDel: TButton
+    Left = 264
+    Height = 25
+    Top = 144
+    Width = 75
+    Caption = 'del'
+    OnClick = bDelClick
+    TabOrder = 1
+  end
+  object bColor: TButton
+    Left = 344
+    Height = 25
+    Top = 144
+    Width = 75
+    Caption = 'color'
+    OnClick = bColorClick
+    TabOrder = 2
+  end
+  object bLeft: TButton
+    Left = 264
+    Height = 25
+    Top = 176
+    Width = 75
+    Caption = '<'
+    OnClick = bLeftClick
+    TabOrder = 3
+  end
+  object bRt: TButton
+    Left = 344
+    Height = 25
+    Top = 176
+    Width = 75
+    Caption = '>'
+    OnClick = bRtClick
+    TabOrder = 4
+  end
+  object Edit1: TEdit
+    Left = 264
+    Height = 27
+    Top = 208
+    Width = 225
+    OnChange = Edit1Change
+    TabOrder = 5
+  end
+  object chkX: TCheckBox
+    Left = 144
+    Height = 24
+    Top = 88
+    Width = 137
+    Caption = 'show "x" buttons'
+    OnClick = chkXClick
+    TabOrder = 6
+  end
+  object chkPlus: TCheckBox
+    Left = 144
+    Height = 24
+    Top = 104
+    Width = 112
+    Caption = 'show "+" tab'
+    OnClick = chkPlusClick
+    TabOrder = 7
+  end
+  object chkNums: TCheckBox
+    Left = 344
+    Height = 24
+    Top = 88
+    Width = 121
+    Caption = 'show numbers'
+    OnClick = chkNumsClick
+    TabOrder = 8
+  end
+  object bMod: TButton
+    Left = 144
+    Height = 25
+    Top = 176
+    Width = 113
+    Caption = 'toggle modified'
+    OnClick = bModClick
+    TabOrder = 9
+  end
+  object chkEntire: TCheckBox
+    Left = 144
+    Height = 24
+    Top = 120
+    Width = 125
+    Caption = 'color entire tab'
+    OnClick = chkEntireClick
+    TabOrder = 10
+  end
+end
