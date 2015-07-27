@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="5">
+    <Units Count="6">
       <Unit0>
         <Filename Value="Demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -18,22 +18,22 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
         <TopLine Value="66"/>
         <CursorPos X="3" Y="66"/>
         <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit1>
       <Unit2>
         <Filename Value="../attabs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATTabs"/>
-        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1520"/>
         <CursorPos X="62" Y="1520"/>
         <FoldState Value=" T0=1861E"/>
         <UsageCount Value="22"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
@@ -51,94 +51,31 @@
         <CursorPos X="10" Y="129"/>
         <UsageCount Value="10"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="../attabs_beta/attabs.pas"/>
+        <UnitName Value="ATTabs"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1064"/>
+        <CursorPos X="9" Y="1083"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit5>
     </Units>
-    <JumpHistory Count="22" HistoryIndex="21">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1067" TopLine="1064"/>
+        <Filename Value="DemoForm.pas"/>
+        <Caret Line="66" Column="3" TopLine="66"/>
       </Position1>
       <Position2>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1559" TopLine="1533"/>
+        <Filename Value="../attabs_beta/attabs.pas"/>
+        <Caret Line="251" Column="14" TopLine="240"/>
       </Position2>
       <Position3>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1410" Column="27" TopLine="1396"/>
+        <Filename Value="../attabs_beta/attabs.pas"/>
+        <Caret Line="1081" Column="5" TopLine="1065"/>
       </Position3>
-      <Position4>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1527" Column="26" TopLine="1514"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="29" Column="3" TopLine="16"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1360" Column="21" TopLine="1347"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="29" Column="9" TopLine="16"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="178" Column="18" TopLine="165"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="297" Column="13" TopLine="285"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="298" Column="17" TopLine="296"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../attabs.pas"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="195" Column="24" TopLine="175"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="196" Column="24" TopLine="176"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1424" Column="28" TopLine="1398"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1427" Column="28" TopLine="1405"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1527" Column="18" TopLine="1505"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../attabs.pas"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="195" Column="24" TopLine="175"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1410" Column="28" TopLine="1388"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1527" Column="18" TopLine="1505"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1080" Column="9" TopLine="1076"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../attabs.pas"/>
-        <Caret Line="1435" Column="62" TopLine="1418"/>
-      </Position22>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

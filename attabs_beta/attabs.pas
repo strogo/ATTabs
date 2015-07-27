@@ -1067,17 +1067,20 @@ procedure TATTabs.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Intege
 begin
   FMouseDown:= false;
   FMouseDownPnt:= Point(0, 0);
-  FMouseDrag:= false;
   FTimerDrag.Enabled:= false;
   Cursor:= crDefault;
   Screen.Cursor:= crDefault;
 
   //do drop?
-  if (FTabIndexDrop>=0) then
+  if FMouseDrag then
   begin
-    DoTabDrop;
-    Invalidate;
-    Exit
+    FMouseDrag:= false;
+    if (FTabIndexDrop>=0) then
+    begin
+      DoTabDrop;
+      Invalidate;
+      Exit
+    end;
   end;
 
   //dbl click?
